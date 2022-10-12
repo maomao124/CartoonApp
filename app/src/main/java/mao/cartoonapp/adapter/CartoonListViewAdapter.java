@@ -70,7 +70,7 @@ public class CartoonListViewAdapter extends BaseAdapter
         if (convertView == null)
         {
             cartoonListViewHolder = new CartoonListViewHolder();
-            convertView = LayoutInflater.from(context).inflate(R.layout.item_listview_cartoon, parent);
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_listview_cartoon, null);
             cartoonListViewHolder.image = convertView.findViewById(R.id.image);
             cartoonListViewHolder.name = convertView.findViewById(R.id.name);
             cartoonListViewHolder.author = convertView.findViewById(R.id.author);
