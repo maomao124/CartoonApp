@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.io.File;
@@ -86,6 +88,27 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
                 Log.d(TAG, "run: 完成");
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList.get(position);
+                String id1 = cartoon.getId();
+                String name = cartoon.getName();
+                String author = cartoon.getAuthor();
+                String imgUrl = cartoon.getImgUrl();
+                Intent intent = new Intent(MainActivity.this, CartoonItemActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("id", id1);
+                bundle.putString("name", name);
+                bundle.putString("author", author);
+                bundle.putString("imgUrl", imgUrl);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
 
