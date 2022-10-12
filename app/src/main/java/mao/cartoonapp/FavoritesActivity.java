@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,6 +46,14 @@ public class FavoritesActivity extends AppCompatActivity
                 {
                     CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(FavoritesActivity.this);
                     cartoonList = cartoonFavoritesDao.queryAll();
+                    for (Cartoon cartoon : cartoonList)
+                    {
+                        Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
+                        cartoon.setBitmap(bitmap);
+                        //因为remarks字段更新比较频繁，应该在这里的时候更新一下请求后端，并更新sqlite数据库
+                        //但是这里没有请求单个漫画信息的后端接口，没办法，所以这里将remarks字段清空
+                        cartoon.setRemarks("");
+                    }
                     if (cartoonList.size() == 0)
                     {
                         return;
@@ -120,13 +129,15 @@ public class FavoritesActivity extends AppCompatActivity
                                 if (delete)
                                 {
                                     toastShow("删除成功");
+                                    cartoonList.remove(cartoon);
+                                    cartoonListViewAdapter.notifyDataSetChanged();
                                 }
                                 else
                                 {
                                     toastShow("删除失败");
                                 }
-                                //判断是否为空
-                                if (cartoonList == null)
+                                //判断是否为0
+                                if (cartoonList.size() == 0)
                                 {
                                     textView.setVisibility(View.VISIBLE);
                                     listView.setVisibility(View.GONE);

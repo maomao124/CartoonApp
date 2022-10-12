@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
                         .setTitle("说明")
                         .setMessage("1.长按列表项可以添加漫画到收藏夹\n" +
                                 "2.开发此软件目的是为了学习安卓\n" +
-                                "3.收藏夹页面长按列表项可以取消收藏" +
+                                "3.收藏夹页面长按列表项可以取消收藏\n" +
                                 "4.作者QQ：1296193245\n" +
                                 "5.作者github：https://github.com/maomao124/")
                         .setPositiveButton("我知道了", null)

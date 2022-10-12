@@ -9,7 +9,7 @@
 
     <TextView
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:text="漫画收藏夹"
             android:textSize="20sp"
             android:gravity="center"
