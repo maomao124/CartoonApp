@@ -99,6 +99,7 @@ public class MainApplication extends Application
         mainApplication = this;
         threadPool = Executors.newFixedThreadPool(6);
         http = new SimpleRestfulHTTPImpl();
+        http.setConnectTimeout(16000);
         http.setReadTimeout(10000);
         http.setThreadPool(threadPool);
 
@@ -124,7 +125,6 @@ public class MainApplication extends Application
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "onConfigurationChanged: ");
     }
-
 
 
     /**

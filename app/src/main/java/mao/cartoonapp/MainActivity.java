@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         menu.add(1, 1, 1, "历史记录");
-        menu.add(1, 2, 2, "收藏夹");
+        menu.add(1, 2, 2, "漫画收藏夹");
         menu.add(1, 999, 999, "退出");
 
         return true;

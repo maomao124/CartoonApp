@@ -1,6 +1,7 @@
 package mao.cartoonapp.adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -175,6 +176,20 @@ public class CartoonViewPagerAdapter extends PagerAdapter
                 catch (Exception e)
                 {
                     Log.e(TAG, "run: ", e);
+                    //只提示用户第二组报错，其它组的异常不提示
+                    activity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            new AlertDialog.Builder(activity)
+                                    .setTitle("错误")
+                                    .setMessage("异常内容：\n" + e)
+                                    .setPositiveButton("我知道了", null)
+                                    .create()
+                                    .show();
+                        }
+                    });
                 }
             }
         });
