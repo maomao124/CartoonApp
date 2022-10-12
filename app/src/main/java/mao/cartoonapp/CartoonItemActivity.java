@@ -18,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import mao.cartoonapp.adapter.CartoonItemListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.entity.CartoonItem;
 import mao.cartoonapp.service.CartoonService;
@@ -28,6 +29,7 @@ public class CartoonItemActivity extends AppCompatActivity
     private static final String TAG = "CartoonItemActivity";
 
     private ListView listView;
+    private CartoonItemListViewAdapter cartoonItemListViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -87,19 +89,29 @@ public class CartoonItemActivity extends AppCompatActivity
                 int size = cartoonItemList.size();
                 Log.d(TAG, "run: 大小：" + size);
                 Log.d(TAG, "run: 数据：\n" + cartoonItemList);
-                runOnUiThread(new Runnable()
+                try
                 {
-                    @Override
-                    public void run()
+                    for (int i = 0; i < size; i++)
                     {
-                        for (int i = 0; i < size; i++)
-                        {
-                            int textViewId = size - i;
-                            cartoonItemList.get(i).setTextViewId(String.valueOf(textViewId));
-                        }
-
+                        int textViewId = size - i;
+                        cartoonItemList.get(i).setTextViewId(String.valueOf(textViewId));
+                        Log.d(TAG, "run: " + textViewId);
                     }
-                });
+                    cartoonItemListViewAdapter = new CartoonItemListViewAdapter(CartoonItemActivity.this, cartoonItemList);
+                    runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            cartoonItemListViewAdapter.notifyDataSetChanged();
+                            listView.setAdapter(cartoonItemListViewAdapter);
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    Log.e(TAG, "run: ", e);
+                }
             }
         });
     }
