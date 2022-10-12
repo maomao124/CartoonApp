@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.viewpager.widget.PagerAdapter;
 
 import java.util.ArrayList;
@@ -42,6 +44,9 @@ public class CartoonViewPagerAdapter extends PagerAdapter
 
     private Activity activity;
 
+    /**
+     * 标签
+     */
     private static final String TAG = "CartoonViewPagerAdapter";
 
     private List<Cartoon> cartoonList1;
@@ -54,6 +59,16 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     private final ListView[] listViewList;
 
     private final CartoonListViewAdapter[] cartoonListViewAdapterList;
+
+    private final String[] titleList =
+            {
+                    URLConstant.rank1Name,
+                    URLConstant.rank2Name,
+                    URLConstant.rank3Name,
+                    URLConstant.rank4Name,
+                    URLConstant.rank5Name,
+                    URLConstant.rank6Name,
+            };
 
 
     public CartoonViewPagerAdapter(Activity activity)
@@ -516,12 +531,35 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     @Override
     public int getCount()
     {
-        return 0;
+        return 6;
     }
 
     @Override
     public boolean isViewFromObject(@NonNull View view, @NonNull Object object)
     {
-        return false;
+        return view == object;
+    }
+
+    @NonNull
+    @Override
+    public Object instantiateItem(@NonNull ViewGroup container, int position)
+    {
+        Log.d(TAG, "instantiateItem: 页面初始化：" + position);
+        container.addView(listViewList[position]);
+        return listViewList[position];
+    }
+
+    @Override
+    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object)
+    {
+        Log.d(TAG, "instantiateItem: 页面销毁：" + position);
+        container.removeView(listViewList[position]);
+    }
+
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position)
+    {
+        return titleList[position];
     }
 }
