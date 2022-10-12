@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toastShow("加载中，请稍后");
+        toastShow("异步加载中，请稍后");
 
         ViewPager viewPager = findViewById(R.id.ViewPager);
         PagerTitleStrip pagerTitleStrip = findViewById(R.id.PagerTabStrip);
