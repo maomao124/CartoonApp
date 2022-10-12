@@ -2,13 +2,17 @@ package mao.cartoonapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.PagerTitleStrip;
+import androidx.viewpager.widget.ViewPager;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mao.cartoonapp.adapter.CartoonListViewAdapter;
+import mao.cartoonapp.adapter.CartoonViewPagerAdapter;
 import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.entity.Cartoon;
@@ -43,16 +48,27 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
 
 
+    /**
+     * 退出时间
+     */
+    private long exitTime = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //startActivity(new Intent(this, ContentActivity.class));
-
         toastShow("加载中，请稍后");
 
+        ViewPager viewPager = findViewById(R.id.ViewPager);
+        PagerTitleStrip pagerTitleStrip = findViewById(R.id.PagerTabStrip);
+        pagerTitleStrip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+        pagerTitleStrip.setTextColor(Color.rgb(200, 20, 255));
+
+        CartoonViewPagerAdapter cartoonViewPagerAdapter = new CartoonViewPagerAdapter(this);
+        viewPager.setAdapter(cartoonViewPagerAdapter);
+        viewPager.setCurrentItem(1);
 
     }
 
@@ -96,4 +112,18 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    @Override
+    public void onBackPressed()
+    {
+        if ((System.currentTimeMillis() - exitTime) > 2000)
+        {
+            Toast.makeText(getApplicationContext(), "再按一次退出程序",
+                    Toast.LENGTH_SHORT).show();
+            exitTime = System.currentTimeMillis();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
 }
