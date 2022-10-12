@@ -1,12 +1,16 @@
 package mao.cartoonapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -37,9 +41,6 @@ public class MainActivity extends AppCompatActivity
      * 标签
      */
     private static final String TAG = "MainActivity";
-    private ListView listView;
-    private CartoonListViewAdapter cartoonListViewAdapter;
-    private List<Cartoon> cartoonList;
 
 
     @Override
@@ -52,71 +53,37 @@ public class MainActivity extends AppCompatActivity
 
         toastShow("加载中，请稍后");
 
-        listView = findViewById(R.id.ListView);
-
-
-        MainApplication.getInstance().getThreadPool().submit(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                CartoonService cartoonService = MainApplication.getInstance().getCartoonService();
-                cartoonList = cartoonService.getCartoonList(URLConstant.rankUrl2, URLConstant.rankUrl2Type);
-                Log.d(TAG, "run: 大小：" + cartoonList.size());
-                Log.d(TAG, "run: 请求完成：\n" + cartoonList);
-                cartoonListViewAdapter = new CartoonListViewAdapter(MainActivity.this, cartoonList);
-                runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        cartoonListViewAdapter.notifyDataSetChanged();
-                        listView.setAdapter(cartoonListViewAdapter);
-                    }
-                });
-                for (Cartoon cartoon : cartoonList)
-                {
-                    Log.d(TAG, "run: " + cartoon.getImgUrl());
-                    Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
-                    cartoon.setBitmap(bitmap);
-                }
-
-                runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        cartoonListViewAdapter.notifyDataSetChanged();
-                        listView.setAdapter(cartoonListViewAdapter);
-                    }
-                });
-                Log.d(TAG, "run: 完成");
-            }
-        });
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                Cartoon cartoon = cartoonList.get(position);
-                String id1 = cartoon.getId();
-                String name = cartoon.getName();
-                String author = cartoon.getAuthor();
-                String imgUrl = cartoon.getImgUrl();
-                Intent intent = new Intent(MainActivity.this, CartoonItemActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("id", id1);
-                bundle.putString("name", name);
-                bundle.putString("author", author);
-                bundle.putString("imgUrl", imgUrl);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            }
-        });
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        menu.add(1, 1, 1, "历史记录");
+        menu.add(1, 2, 2, "收藏夹");
+        menu.add(1, 999, 999, "退出");
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        int id = item.getItemId();
+        switch (id)
+        {
+            case 1:
+                toastShow("未实现历史记录功能，也不想实现");
+                break;
+            case 2:
+                toastShow("功能未实现");
+                break;
+            case 999:
+                finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     /**
      * 显示消息
