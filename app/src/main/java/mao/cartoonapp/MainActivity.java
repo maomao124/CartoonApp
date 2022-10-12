@@ -5,40 +5,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerTitleStrip;
 import androidx.viewpager.widget.ViewPager;
 
-import android.app.Activity;
+
 import android.app.AlertDialog;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
 
-import mao.cartoonapp.adapter.CartoonListViewAdapter;
 import mao.cartoonapp.adapter.CartoonViewPagerAdapter;
-import mao.cartoonapp.application.MainApplication;
-import mao.cartoonapp.constant.URLConstant;
-import mao.cartoonapp.entity.Cartoon;
-import mao.cartoonapp.entity.ImageLoadResult;
-import mao.cartoonapp.service.CartoonService;
+
+import mao.cartoonapp.dao.CartoonFavoritesDao;
+
 
 public class MainActivity extends AppCompatActivity
 {
@@ -53,6 +36,7 @@ public class MainActivity extends AppCompatActivity
      * 退出时间
      */
     private long exitTime = 0;
+    private CartoonFavoritesDao cartoonFavoritesDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,6 +55,10 @@ public class MainActivity extends AppCompatActivity
         viewPager.setAdapter(cartoonViewPagerAdapter);
         viewPager.setCurrentItem(1);
 
+
+        cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
+        cartoonFavoritesDao.openReadConnection();
+        cartoonFavoritesDao.openWriteConnection();
     }
 
     @Override
@@ -113,6 +101,12 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        cartoonFavoritesDao.closeConnection();
+    }
 
     /**
      * 显示消息

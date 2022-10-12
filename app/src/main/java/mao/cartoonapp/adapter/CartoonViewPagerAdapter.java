@@ -356,7 +356,165 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             }
         });
 
+        listViewList[1].setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList2.get(position);
+                new AlertDialog.Builder(activity)
+                        .setTitle("提示")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“加入到收藏夹？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean insert = CartoonFavoritesDao.getInstance(activity).insert(cartoon);
+                                if (insert)
+                                {
+                                    toastShow("加入成功");
+                                }
+                                else
+                                {
+                                    toastShow("加入失败");
+                                }
+                            }
+                        })
+                        .setNeutralButton("否", null)
+                        .create()
+                        .show();
+                return true;
+            }
+        });
 
+        listViewList[2].setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList3.get(position);
+                new AlertDialog.Builder(activity)
+                        .setTitle("提示")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“加入到收藏夹？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean insert = CartoonFavoritesDao.getInstance(activity).insert(cartoon);
+                                if (insert)
+                                {
+                                    toastShow("加入成功");
+                                }
+                                else
+                                {
+                                    toastShow("加入失败");
+                                }
+                            }
+                        })
+                        .setNeutralButton("否", null)
+                        .create()
+                        .show();
+                return true;
+            }
+        });
+
+        listViewList[3].setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList4.get(position);
+                new AlertDialog.Builder(activity)
+                        .setTitle("提示")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“加入到收藏夹？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean insert = CartoonFavoritesDao.getInstance(activity).insert(cartoon);
+                                if (insert)
+                                {
+                                    toastShow("加入成功");
+                                }
+                                else
+                                {
+                                    toastShow("加入失败");
+                                }
+                            }
+                        })
+                        .setNeutralButton("否", null)
+                        .create()
+                        .show();
+                return true;
+            }
+        });
+
+        listViewList[4].setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList5.get(position);
+                new AlertDialog.Builder(activity)
+                        .setTitle("提示")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“加入到收藏夹？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean insert = CartoonFavoritesDao.getInstance(activity).insert(cartoon);
+                                if (insert)
+                                {
+                                    toastShow("加入成功");
+                                }
+                                else
+                                {
+                                    toastShow("加入失败");
+                                }
+                            }
+                        })
+                        .setNeutralButton("否", null)
+                        .create()
+                        .show();
+                return true;
+            }
+        });
+
+        listViewList[5].setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList6.get(position);
+                new AlertDialog.Builder(activity)
+                        .setTitle("提示")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“加入到收藏夹？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean insert = CartoonFavoritesDao.getInstance(activity).insert(cartoon);
+                                if (insert)
+                                {
+                                    toastShow("加入成功");
+                                }
+                                else
+                                {
+                                    toastShow("加入失败");
+                                }
+                            }
+                        })
+                        .setNeutralButton("否", null)
+                        .create()
+                        .show();
+                return true;
+            }
+        });
 
     }
 
