@@ -3,9 +3,11 @@ package mao.cartoonapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 public class ContentActivity extends AppCompatActivity
 {
@@ -16,6 +18,20 @@ public class ContentActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
+
+        Intent intent = getIntent();
+        if (intent == null)
+        {
+            toastShow("获取不到数据");
+            return;
+        }
+        Bundle bundle = intent.getExtras();
+        String html = bundle.getString("html");
+        if (html == null)
+        {
+            toastShow("获取不到数据");
+            return;
+        }
 
         WebView webView = findViewById(R.id.WebView);
 
@@ -36,6 +52,16 @@ public class ContentActivity extends AppCompatActivity
         webView.getSettings().setAllowContentAccess(true);
         webView.getSettings().setAppCacheEnabled(true);//是否使用缓存
 
-        webView.loadUrl("http://m.qiman57.com/21429/1412168.html");
+        webView.loadUrl(html);
+    }
+
+    /**
+     * 显示消息
+     *
+     * @param message 消息
+     */
+    private void toastShow(String message)
+    {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

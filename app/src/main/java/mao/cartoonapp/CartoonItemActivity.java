@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import java.util.List;
 
 import mao.cartoonapp.adapter.CartoonItemListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
+import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.entity.CartoonItem;
 import mao.cartoonapp.service.CartoonService;
 
@@ -30,6 +33,8 @@ public class CartoonItemActivity extends AppCompatActivity
 
     private ListView listView;
     private CartoonItemListViewAdapter cartoonItemListViewAdapter;
+    private List<CartoonItem> cartoonItemList;
+    private String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,7 +51,7 @@ public class CartoonItemActivity extends AppCompatActivity
             return;
         }
         Bundle bundle = intent.getExtras();
-        String id = bundle.getString("id");
+        id = bundle.getString("id");
         String name = bundle.getString("name");
         String author = bundle.getString("author");
         String imgUrl = bundle.getString("imgUrl");
@@ -85,7 +90,7 @@ public class CartoonItemActivity extends AppCompatActivity
             {
                 Log.d(TAG, "run: 发起请求");
                 CartoonService cartoonService = MainApplication.getInstance().getCartoonService();
-                List<CartoonItem> cartoonItemList = cartoonService.getCartoonItem(Integer.parseInt(id));
+                cartoonItemList = cartoonService.getCartoonItem(Integer.parseInt(id));
                 int size = cartoonItemList.size();
                 Log.d(TAG, "run: 大小：" + size);
                 Log.d(TAG, "run: 数据：\n" + cartoonItemList);
@@ -107,11 +112,26 @@ public class CartoonItemActivity extends AppCompatActivity
                             listView.setAdapter(cartoonItemListViewAdapter);
                         }
                     });
+
                 }
                 catch (Exception e)
                 {
                     Log.e(TAG, "run: ", e);
                 }
+            }
+        });
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                CartoonItem cartoonItem = cartoonItemList.get(position);
+                String id2 = cartoonItem.getId();
+                String html = URLConstant.baseUrl + CartoonItemActivity.this.id + "/" + id2 + ".html";
+                Intent intent2 = new Intent(CartoonItemActivity.this, ContentActivity.class);
+                intent2.putExtra("html", html);
+                Log.d(TAG, "onItemClick: html:" + html);
+                startActivity(intent2);
             }
         });
     }
