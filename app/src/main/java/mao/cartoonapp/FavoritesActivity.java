@@ -3,6 +3,7 @@ package mao.cartoonapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -106,7 +107,35 @@ public class FavoritesActivity extends AppCompatActivity
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
             {
-
+                Cartoon cartoon = cartoonList.get(position);
+                new AlertDialog.Builder(FavoritesActivity.this)
+                        .setTitle("删除提示！")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“删除？")
+                        .setPositiveButton("确定删除", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean delete = CartoonFavoritesDao.getInstance(FavoritesActivity.this).delete(cartoon.getId());
+                                if (delete)
+                                {
+                                    toastShow("删除成功");
+                                }
+                                else
+                                {
+                                    toastShow("删除失败");
+                                }
+                                //判断是否为空
+                                if (cartoonList == null)
+                                {
+                                    textView.setVisibility(View.VISIBLE);
+                                    listView.setVisibility(View.GONE);
+                                }
+                            }
+                        })
+                        .setNeutralButton("取消", null)
+                        .create()
+                        .show();
                 return true;
             }
         });
