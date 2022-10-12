@@ -1,5 +1,7 @@
 package mao.cartoonapp.entity;
 
+import android.graphics.Bitmap;
+
 /**
  * Project name(项目名称)：解析漫画网站
  * Package(包名): mao.entity
@@ -40,6 +42,12 @@ public class Cartoon
      * img url
      */
     private String imgUrl;
+
+
+    /**
+     * 位图
+     */
+    private Bitmap bitmap;
 
     /**
      * Instantiates a new Cartoon.
@@ -174,6 +182,17 @@ public class Cartoon
     public Cartoon setImgUrl(String imgUrl)
     {
         this.imgUrl = imgUrl;
+        return this;
+    }
+
+    public Bitmap getBitmap()
+    {
+        return bitmap;
+    }
+
+    public Cartoon setBitmap(Bitmap bitmap)
+    {
+        this.bitmap = bitmap;
         return this;
     }
 
