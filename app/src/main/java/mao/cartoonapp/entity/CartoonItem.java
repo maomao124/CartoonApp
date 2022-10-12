@@ -22,6 +22,11 @@ public class CartoonItem
     private String id;
 
     /**
+     * 文本视图id
+     */
+    private String TextViewId;
+
+    /**
      * 章节名字
      */
     private String name;
@@ -89,12 +94,24 @@ public class CartoonItem
         return this;
     }
 
+    public String getTextViewId()
+    {
+        return TextViewId;
+    }
+
+    public CartoonItem setTextViewId(String textViewId)
+    {
+        TextViewId = textViewId;
+        return this;
+    }
+
     @Override
     @SuppressWarnings("all")
     public String toString()
     {
         final StringBuilder stringbuilder = new StringBuilder();
         stringbuilder.append("id：").append(id).append('\n');
+        stringbuilder.append("TextViewId：").append(TextViewId).append('\n');
         stringbuilder.append("name：").append(name).append('\n');
         return stringbuilder.toString();
     }

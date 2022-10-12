@@ -16,8 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import mao.cartoonapp.application.MainApplication;
+import mao.cartoonapp.entity.CartoonItem;
+import mao.cartoonapp.service.CartoonService;
 
 public class CartoonItemActivity extends AppCompatActivity
 {
@@ -68,6 +71,33 @@ public class CartoonItemActivity extends AppCompatActivity
                     public void run()
                     {
                         imageView.setImageBitmap(bitmap);
+                    }
+                });
+            }
+        });
+
+        MainApplication.getInstance().getThreadPool().submit(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Log.d(TAG, "run: 发起请求");
+                CartoonService cartoonService = MainApplication.getInstance().getCartoonService();
+                List<CartoonItem> cartoonItemList = cartoonService.getCartoonItem(Integer.parseInt(id));
+                int size = cartoonItemList.size();
+                Log.d(TAG, "run: 大小：" + size);
+                Log.d(TAG, "run: 数据：\n" + cartoonItemList);
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        for (int i = 0; i < size; i++)
+                        {
+                            int textViewId = size - i;
+                            cartoonItemList.get(i).setTextViewId(String.valueOf(textViewId));
+                        }
+
                     }
                 });
             }
