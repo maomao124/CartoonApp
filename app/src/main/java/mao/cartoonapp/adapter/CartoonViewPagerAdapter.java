@@ -2,6 +2,7 @@ package mao.cartoonapp.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,7 @@ import mao.cartoonapp.MainActivity;
 import mao.cartoonapp.R;
 import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.constant.URLConstant;
+import mao.cartoonapp.dao.CartoonFavoritesDao;
 import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.service.CartoonService;
 
@@ -320,6 +323,41 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             }
         });
 
+
+        listViewList[0].setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList1.get(position);
+                new AlertDialog.Builder(activity)
+                        .setTitle("提示")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“加入到收藏夹？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean insert = CartoonFavoritesDao.getInstance(activity).insert(cartoon);
+                                if (insert)
+                                {
+                                    toastShow("加入成功");
+                                }
+                                else
+                                {
+                                    toastShow("加入失败");
+                                }
+                            }
+                        })
+                        .setNeutralButton("否", null)
+                        .create()
+                        .show();
+                return true;
+            }
+        });
+
+
+
     }
 
     private void load1(Activity activity)
@@ -577,4 +615,15 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     {
         return titleList[position];
     }
+
+    /**
+     * 显示消息
+     *
+     * @param message 消息
+     */
+    private void toastShow(String message)
+    {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+    }
+
 }

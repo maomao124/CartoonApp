@@ -6,6 +6,7 @@ import androidx.viewpager.widget.PagerTitleStrip;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity
     {
         menu.add(1, 1, 1, "历史记录");
         menu.add(1, 2, 2, "漫画收藏夹");
+        menu.add(1, 3, 3, "软件说明");
         menu.add(1, 999, 999, "退出");
 
         return true;
@@ -93,6 +95,17 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 2:
                 toastShow("功能未实现");
+                break;
+            case 3:
+                new AlertDialog.Builder(this)
+                        .setTitle("说明")
+                        .setMessage("1.长按列表项可以添加漫画到收藏夹\n" +
+                                "2.开发此软件目的是为了学习安卓\n" +
+                                "3.作者QQ：1296193245\n" +
+                                "4.作者github：https://github.com/maomao124/")
+                        .setPositiveButton("我知道了", null)
+                        .create()
+                        .show();
                 break;
             case 999:
                 finish();
