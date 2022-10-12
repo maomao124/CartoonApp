@@ -2,15 +2,27 @@ package mao.cartoonapp.application;
 
 import android.app.Application;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import mao.cartoonapp.R;
+import mao.cartoonapp.entity.Cartoon;
+import mao.cartoonapp.entity.ImageLoadResult;
 import mao.cartoonapp.net.RestfulHTTP;
 import mao.cartoonapp.net.SimpleRestfulHTTPImpl;
 import mao.cartoonapp.service.CartoonService;
@@ -111,5 +123,149 @@ public class MainApplication extends Application
     {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "onConfigurationChanged: ");
+    }
+
+
+
+    /**
+     * 加载图片
+     *
+     * @param cartoon 卡通
+     * @return {@link Bitmap}
+     */
+    public Bitmap loadImage(Cartoon cartoon)
+    {
+        String imgPath = getExternalCacheDir().toString() + "/" + cartoon.getId() + ".jpg";
+        Log.d(TAG, "loadImage: imgPath" + imgPath);
+        //从本地加载
+        Bitmap bitmap = openImage(imgPath);
+        if (bitmap != null)
+        {
+            //本地存在，直接返回
+            Log.d(TAG, "loadImage: 本地存在图片：" + cartoon.getId());
+            return bitmap;
+        }
+        //本地不存在,从网络上加载
+        ImageLoadResult imageLoadResult = openImageByHTTP(cartoon.getImgUrl());
+        if (imageLoadResult.isStatus())
+        {
+            Log.d(TAG, "loadImage: 从网络上加载图片成功：" + cartoon.getId());
+            //从网络上成功加载，保存到本地
+            saveImage(imgPath, imageLoadResult.getBitmap());
+            return imageLoadResult.getBitmap();
+        }
+        //从网络上加载失败，是默认的图片
+        return imageLoadResult.getBitmap();
+    }
+
+
+    /**
+     * 从指定路径的图片文件中读取位图数据
+     *
+     * @param path 路径
+     * @return {@link Bitmap}
+     */
+    public Bitmap openImage(String path)
+    {
+        // 声明一个位图对象
+        Bitmap bitmap = null;
+        // 根据指定的文件路径构建文件输入流对象
+        try (FileInputStream fileInputStream = new FileInputStream(path))
+        {
+            // 从文件输入流中解码位图数据
+            bitmap = BitmapFactory.decodeStream(fileInputStream);
+        }
+        catch (Exception e)
+        {
+            //e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+
+    public ImageLoadResult openImageByHTTP(String imgUrl)
+    {
+        Bitmap bitmap;
+        InputStream inputStream = null;
+        HttpURLConnection httpURLConnection = null;
+        try
+        {
+            URL url = new URL(imgUrl);
+            httpURLConnection = (HttpURLConnection) url.openConnection();
+            inputStream = httpURLConnection.getInputStream();
+            bitmap = BitmapFactory.decodeStream(inputStream);
+            return new ImageLoadResult(true, bitmap);
+        }
+        catch (Exception e)
+        {
+            //加载失败，直接加载默认的图片
+            Log.e(TAG, "openImageByHTTP: ", e);
+            bitmap = BitmapFactory.decodeResource(this.getResources(), R.mipmap.ic_launcher_round);
+            return new ImageLoadResult(false, bitmap);
+        }
+        finally
+        {
+            try
+            {
+                if (inputStream != null)
+                {
+                    inputStream.close();
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            if (httpURLConnection != null)
+            {
+                httpURLConnection.disconnect();
+            }
+        }
+    }
+
+
+    /**
+     * 从指定路径的图片文件中读取位图数据
+     *
+     * @param file File对象
+     * @return {@link Bitmap}
+     */
+    public Bitmap openImage(File file)
+    {
+        // 声明一个位图对象
+        Bitmap bitmap = null;
+        // 根据指定的文件路径构建文件输入流对象
+        try (FileInputStream fileInputStream = new FileInputStream(file))
+        {
+            // 从文件输入流中解码位图数据
+            bitmap = BitmapFactory.decodeStream(fileInputStream);
+        }
+        catch (Exception e)
+        {
+            //e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    /**
+     * 把位图数据保存到指定路径的图片文件
+     *
+     * @param path   路径
+     * @param bitmap Bitmap对象
+     */
+    public boolean saveImage(String path, Bitmap bitmap)
+    {
+        // 根据指定的文件路径构建文件输出流对象
+        try (FileOutputStream fileOutputStream = new FileOutputStream(path))
+        {
+            // 把位图数据压缩到文件输出流中
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream);
+            return true;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
