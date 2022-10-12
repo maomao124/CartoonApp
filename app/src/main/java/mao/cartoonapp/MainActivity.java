@@ -8,6 +8,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.app.AlertDialog;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -82,15 +83,16 @@ public class MainActivity extends AppCompatActivity
                 toastShow("未实现历史记录功能，也不想实现");
                 break;
             case 2:
-                toastShow("功能未实现");
+                startActivity(new Intent(this, FavoritesActivity.class));
                 break;
             case 3:
                 new AlertDialog.Builder(this)
                         .setTitle("说明")
                         .setMessage("1.长按列表项可以添加漫画到收藏夹\n" +
                                 "2.开发此软件目的是为了学习安卓\n" +
-                                "3.作者QQ：1296193245\n" +
-                                "4.作者github：https://github.com/maomao124/")
+                                "3.收藏夹页面长按列表项可以取消收藏" +
+                                "4.作者QQ：1296193245\n" +
+                                "5.作者github：https://github.com/maomao124/")
                         .setPositiveButton("我知道了", null)
                         .create()
                         .show();
