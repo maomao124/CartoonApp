@@ -2,6 +2,7 @@ package mao.cartoonapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -9,6 +10,7 @@ import android.webkit.WebViewClient;
 public class ContentActivity extends AppCompatActivity
 {
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
