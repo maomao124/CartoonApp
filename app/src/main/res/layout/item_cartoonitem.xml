@@ -8,11 +8,14 @@
 
     <TextView
             android:id="@+id/id"
-            android:layout_width="@dimen/item_cartoonitem_height"
-            android:layout_height="@dimen/item_cartoonitem_height" />
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_width="70dp"
+            android:layout_height="@dimen/item_cartoonitem_height"
+            android:textSize="16sp" />
 
     <TextView
             android:id="@+id/name"
+            android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="@dimen/item_cartoonitem_height" />
 

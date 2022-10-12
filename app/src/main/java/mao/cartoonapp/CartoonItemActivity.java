@@ -95,7 +95,7 @@ public class CartoonItemActivity extends AppCompatActivity
                     {
                         int textViewId = size - i;
                         cartoonItemList.get(i).setTextViewId(String.valueOf(textViewId));
-                        Log.d(TAG, "run: " + textViewId);
+                        //Log.d(TAG, "run: " + textViewId);
                     }
                     cartoonItemListViewAdapter = new CartoonItemListViewAdapter(CartoonItemActivity.this, cartoonItemList);
                     runOnUiThread(new Runnable()
