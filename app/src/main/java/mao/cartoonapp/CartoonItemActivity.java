@@ -134,6 +134,8 @@ public class CartoonItemActivity extends AppCompatActivity
                 String html = URLConstant.baseUrl + CartoonItemActivity.this.id + "/" + id2 + ".html";
                 Intent intent2 = new Intent(CartoonItemActivity.this, ContentActivity.class);
                 intent2.putExtra("html", html);
+                intent2.putExtra("name", name);
+                intent2.putExtra("author", author);
                 Log.d(TAG, "onItemClick: html:" + html);
                 startActivity(intent2);
             }
