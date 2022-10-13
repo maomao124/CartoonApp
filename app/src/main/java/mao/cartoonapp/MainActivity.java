@@ -6,10 +6,15 @@ import androidx.viewpager.widget.PagerTitleStrip;
 import androidx.viewpager.widget.ViewPager;
 
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import android.util.TypedValue;
@@ -33,6 +38,11 @@ public class MainActivity extends AppCompatActivity
      */
     private static final String TAG = "MainActivity";
 
+
+    /**
+     * 网络接收器
+     */
+    private NetworkReceiver networkReceiver;
 
     /**
      * 退出时间
@@ -65,6 +75,10 @@ public class MainActivity extends AppCompatActivity
         cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
         cartoonHistoryDao.openReadConnection();
         cartoonHistoryDao.openWriteConnection();
+
+        networkReceiver = new NetworkReceiver();
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(networkReceiver, intentFilter);
     }
 
     @Override
@@ -136,6 +150,7 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         cartoonFavoritesDao.closeConnection();
         cartoonHistoryDao.closeConnection();
+        unregisterReceiver(networkReceiver);
     }
 
     /**
@@ -163,4 +178,29 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
+
+
+    private class NetworkReceiver extends BroadcastReceiver
+    {
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if (intent == null)
+            {
+                return;
+            }
+            NetworkInfo networkInfo = intent.getParcelableExtra("networkInfo");
+            if (networkInfo.getTypeName().equals("MOBILE") && networkInfo.getState() == NetworkInfo.State.CONNECTED)
+            {
+                toastShow("当前使用的是移动数据网络，请注意您的流量消耗∠( °ω°)／ ");
+            }
+            if (networkInfo.getState() == NetworkInfo.State.DISCONNECTED)
+            {
+                toastShow("断网啦ヽ(。>д<)ｐ");
+            }
+        }
+    }
+
 }
