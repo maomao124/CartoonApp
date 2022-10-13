@@ -123,6 +123,28 @@ public class CartoonHistoryActivity extends AppCompatActivity
                             startActivity(intent2);
                         }
                     });
+
+                    listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+                    {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+                        {
+                            Cartoon cartoon = cartoonList.get(position);
+                            String id1 = cartoon.getId();
+                            String name = cartoon.getName();
+                            String author = cartoon.getAuthor();
+                            String imgUrl = cartoon.getImgUrl();
+                            Intent intent = new Intent(CartoonHistoryActivity.this, CartoonItemActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("id", id1);
+                            bundle.putString("name", name);
+                            bundle.putString("author", author);
+                            bundle.putString("imgUrl", imgUrl);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                            return true;
+                        }
+                    });
                 }
                 catch (Exception e)
                 {

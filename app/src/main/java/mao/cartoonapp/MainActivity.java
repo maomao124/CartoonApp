@@ -145,7 +145,8 @@ public class MainActivity extends AppCompatActivity
                                 "3.漫画详情页面底部添加了两个按钮\n" +
                                 "4.漫画详情页面添加了漫画加入到收藏功能\n" +
                                 "5.漫画详情页面添加了开始阅读或者继续阅读功能\n" +
-                                "6.历史记录页面添加了最近阅读时间显示，原为remark字段")
+                                "6.历史记录页面添加了最近阅读时间显示，原为remark字段\n" +
+                                "7.添加了在历史记录页面长按列表项进入漫画详情页面的功能")
                         .setPositiveButton("我知道了", null)
                         .create()
                         .show();
