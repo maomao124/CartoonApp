@@ -75,21 +75,29 @@ public class searchActivity extends AppCompatActivity
                                 return;
                             }
 
-                            for (Cartoon cartoon : cartoonList)
-                            {
-                                Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
-                                cartoon.setBitmap(bitmap);
-                            }
-
                             CartoonListViewAdapter cartoonListViewAdapter =
                                     new CartoonListViewAdapter(searchActivity.this, cartoonList);
-
                             runOnUiThread(new Runnable()
                             {
                                 @Override
                                 public void run()
                                 {
                                     toastShow("搜索到" + cartoonList.size() + "条结果");
+                                    listView.setAdapter(cartoonListViewAdapter);
+                                    cartoonListViewAdapter.notifyDataSetChanged();
+                                }
+                            });
+                            for (Cartoon cartoon : cartoonList)
+                            {
+                                Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
+                                cartoon.setBitmap(bitmap);
+                            }
+                            runOnUiThread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+
                                     listView.setAdapter(cartoonListViewAdapter);
                                     cartoonListViewAdapter.notifyDataSetChanged();
                                 }

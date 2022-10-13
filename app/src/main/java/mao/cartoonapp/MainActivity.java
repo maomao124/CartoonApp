@@ -133,7 +133,16 @@ public class MainActivity extends AppCompatActivity
                                 "7.右上角的菜单可以使用\n" +
                                 "8.开发此软件目的是为了学习安卓\n" +
                                 "9.作者QQ：1296193245\n" +
-                                "10.作者github：https://github.com/maomao124/")
+                                "10.作者github：https://github.com/maomao124/" +
+                                "\n\n" +
+                                "当前版本：v1.1" +
+                                "\n\n\n" +
+                                "版本更新说明：" +
+                                "\n\n" +
+                                "v1.1：\n" +
+                                "1.优化搜索页面结果显示，还是异步加载，但是分成了两阶段\n" +
+                                "2.主题由安卓默认颜色更改成#00ccff(天蓝色)\n" +
+                                "")
                         .setPositiveButton("我知道了", null)
                         .create()
                         .show();

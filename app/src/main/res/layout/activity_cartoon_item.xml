@@ -62,12 +62,37 @@
                 android:text="章节名称"
                 android:layout_height="@dimen/item_cartoonitem_height" />
 
+
     </LinearLayout>
 
 
     <ListView
             android:id="@+id/ListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <Button
+                android:id="@+id/Button_add_favorites"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="5dp"
+                android:text="加入到收藏" />
+
+        <Button
+                android:id="@+id/Button_start"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="5dp"
+                android:text="开始阅读" />
+
+    </LinearLayout>
 
 </LinearLayout>
