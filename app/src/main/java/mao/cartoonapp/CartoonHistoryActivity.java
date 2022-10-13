@@ -37,6 +37,10 @@ public class CartoonHistoryActivity extends AppCompatActivity
     private static final String TAG = "CartoonHistoryActivity";
     private ListView listView;
     private TextView textView;
+    private List<CartoonHistory> cartoonHistoryList;
+    private List<Cartoon> cartoonList;
+    private CartoonListViewAdapter cartoonListViewAdapter;
+    private volatile boolean isEmpty = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,14 +66,14 @@ public class CartoonHistoryActivity extends AppCompatActivity
                 try
                 {
                     CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(CartoonHistoryActivity.this);
-                    List<CartoonHistory> cartoonHistoryList = cartoonHistoryDao.queryAll();
+                    cartoonHistoryList = cartoonHistoryDao.queryAll();
                     Log.d(TAG, "run: 历史记录：" + cartoonHistoryList);
                     if (cartoonHistoryList.size() == 0)
                     {
                         return;
                     }
-
-                    List<Cartoon> cartoonList = new ArrayList<>(cartoonHistoryList.size());
+                    isEmpty = false;
+                    cartoonList = new ArrayList<>(cartoonHistoryList.size());
                     for (CartoonHistory cartoonHistory : cartoonHistoryList)
                     {
                         Cartoon cartoon = new Cartoon()
@@ -82,8 +86,7 @@ public class CartoonHistoryActivity extends AppCompatActivity
                         cartoon.setBitmap(bitmap);
                         cartoonList.add(cartoon);
                     }
-                    CartoonListViewAdapter cartoonListViewAdapter =
-                            new CartoonListViewAdapter(CartoonHistoryActivity.this, cartoonList);
+                    cartoonListViewAdapter = new CartoonListViewAdapter(CartoonHistoryActivity.this, cartoonList);
                     runOnUiThread(new Runnable()
                     {
                         @Override
@@ -146,6 +149,11 @@ public class CartoonHistoryActivity extends AppCompatActivity
         int id = item.getItemId();
         if (id == 1)
         {
+            if (isEmpty)
+            {
+                toastShow("已经为空了哦o(*≧д≦)o!!");
+                return super.onOptionsItemSelected(item);
+            }
             new AlertDialog.Builder(CartoonHistoryActivity.this)
                     .setTitle("提示")
                     .setMessage("是否清空历史记录？")
@@ -172,6 +180,12 @@ public class CartoonHistoryActivity extends AppCompatActivity
                                                 if (b)
                                                 {
                                                     toastShow("清空成功");
+                                                    cartoonList.clear();
+                                                    cartoonHistoryList.clear();
+                                                    cartoonListViewAdapter.notifyDataSetChanged();
+                                                    textView.setVisibility(View.VISIBLE);
+                                                    listView.setVisibility(View.GONE);
+                                                    isEmpty = true;
                                                 }
                                                 else
                                                 {
