@@ -33,6 +33,36 @@ public class ContentActivity extends AppCompatActivity
     private static final String TAG = "ContentActivity";
     private WebView webView;
 
+
+    /**
+     * js代码，目的是屏蔽一些广告和一些额外的元素
+     */
+    private final String js = "function getClass(parent,sClass)\n" +
+            "{\n" +
+            "\tvar aEle=parent.getElementsByTagName('div');\n" +
+            "\tvar aResult=[];\n" +
+            "\tvar i=0;\n" +
+            "\tfor(i<0;i<aEle.length;i++)\n" +
+            "\t{\n" +
+            "\t\tif(aEle[i].className==sClass)\n" +
+            "\t\t{\n" +
+            "\t\t\taResult.push(aEle[i]);\n" +
+            "\t\t}\n" +
+            "\t};\n" +
+            "\treturn aResult;\n" +
+            "}\n" +
+            "\n" +
+            "function hideOther() \n" +
+            "{\n" +
+            "\tgetClass(document,'guide-download')[0].style.display='none';\n" +
+            "\tgetClass(document,'xxtop')[0].style.display='none';\n" +
+            "\tgetClass(document,'list3_1 similar clearfix mt10')[0].style.display='none';\n" +
+            "\tgetClass(document,'read-end')[0].style.display='none';\n" +
+            "\tgetClass(document,'comment-box hide')[0].style.display='none';\n" +
+            "\tgetClass(document,'comment-input-box')[0].style.display='none';\n" +
+            "\tdocument.getElementById('adhtml').style.display='none';\n" +
+            "}";
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -142,7 +172,26 @@ public class ContentActivity extends AppCompatActivity
                 super.onLoadResource(view, url);
             }
 
+            @Override
+            public void onPageFinished(WebView view, String url)
+            {
+                //guide-download
+                //xxtop
+                //list3_1 similar clearfix mt10
+                //read-end
+                //comment-box hide
+                //comment-input-box
 
+                Log.d(TAG, "onPageFinished: " + url);
+                Pattern pattern = Pattern.compile(URLConstant.baseUrl + "\\d+/\\d+.html");
+                Matcher matcher = pattern.matcher(url);
+                boolean result = matcher.matches();
+                if (result)
+                {
+                    view.loadUrl("javascript:" + js);
+                    view.loadUrl("javascript:hideOther();");
+                }
+            }
         });
 
         webView.getSettings().setJavaScriptEnabled(true);
