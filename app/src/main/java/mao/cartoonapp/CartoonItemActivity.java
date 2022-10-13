@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -27,6 +28,10 @@ import java.util.List;
 import mao.cartoonapp.adapter.CartoonItemListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.constant.URLConstant;
+import mao.cartoonapp.dao.CartoonFavoritesDao;
+import mao.cartoonapp.dao.CartoonHistoryDao;
+import mao.cartoonapp.entity.Cartoon;
+import mao.cartoonapp.entity.CartoonHistory;
 import mao.cartoonapp.entity.CartoonItem;
 import mao.cartoonapp.service.CartoonService;
 
@@ -39,6 +44,11 @@ public class CartoonItemActivity extends AppCompatActivity
     private CartoonItemListViewAdapter cartoonItemListViewAdapter;
     private List<CartoonItem> cartoonItemList;
     private String id;
+    private String name;
+    private String author;
+    private String imgUrl;
+    private Button button_add_favorites;
+    private Button button_start;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +57,8 @@ public class CartoonItemActivity extends AppCompatActivity
         setContentView(R.layout.activity_cartoon_item);
 
         listView = findViewById(R.id.ListView);
+        button_add_favorites = findViewById(R.id.Button_add_favorites);
+        button_start = findViewById(R.id.Button_start);
 
         Intent intent = getIntent();
         if (intent == null)
@@ -56,9 +68,9 @@ public class CartoonItemActivity extends AppCompatActivity
         }
         Bundle bundle = intent.getExtras();
         id = bundle.getString("id");
-        String name = bundle.getString("name");
-        String author = bundle.getString("author");
-        String imgUrl = bundle.getString("imgUrl");
+        name = bundle.getString("name");
+        author = bundle.getString("author");
+        imgUrl = bundle.getString("imgUrl");
         if (id == null)
         {
             toastShow("无法获取数据");
@@ -139,6 +151,190 @@ public class CartoonItemActivity extends AppCompatActivity
                 intent2.putExtra("imgUrl", imgUrl);
                 Log.d(TAG, "onItemClick: html:" + html);
                 startActivity(intent2);
+            }
+        });
+
+        MainApplication.getInstance().getThreadPool().submit(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(CartoonItemActivity.this);
+                Cartoon cartoon = cartoonFavoritesDao.queryById(id);
+                CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(CartoonItemActivity.this);
+                CartoonHistory cartoonHistory = cartoonHistoryDao.queryById(id);
+                Log.d(TAG, "run: cartoon:" + cartoon);
+                Log.d(TAG, "run: cartoonHistory" + cartoonHistory);
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        handlerAddFavoritesButton(cartoon, button_add_favorites, name, author, imgUrl, cartoonFavoritesDao);
+
+                        handlerStartButton(cartoonHistory, button_start, name, author, imgUrl);
+                    }
+                });
+            }
+        });
+
+    }
+
+    /**
+     * 处理程序添加收藏夹按钮
+     *
+     * @param cartoon              卡通
+     * @param button_add_favorites 按钮添加收藏夹
+     * @param name                 名字
+     * @param author               作者
+     * @param imgUrl               img url
+     * @param cartoonFavoritesDao  CartoonFavoritesDao
+     */
+    private void handlerAddFavoritesButton(Cartoon cartoon, Button button_add_favorites, String name, String author, String imgUrl, CartoonFavoritesDao cartoonFavoritesDao)
+    {
+        if (cartoon == null)
+        {
+            //收藏为空
+            button_add_favorites.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Cartoon cartoon1 = new Cartoon()
+                            .setId(id)
+                            .setName(name)
+                            .setAuthor(author)
+                            .setImgUrl(imgUrl)
+                            .setRemarks("");
+                    boolean b = cartoonFavoritesDao.insert(cartoon1);
+                    if (b)
+                    {
+                        toastShow("添加收藏成功");
+                        button_add_favorites.setText("已添加到收藏");
+                        button_add_favorites.setOnClickListener(new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View v)
+                            {
+                                toastShow("已经添加到收藏了哦(*^▽^*)\n" +
+                                        "如果需要取消收藏，请到收藏页面长按取消");
+                            }
+                        });
+                    }
+                    else
+                    {
+                        toastShow("添加收藏失败(；´д｀)ゞ");
+                    }
+                }
+            });
+        }
+        else
+        {
+            //收藏不为空
+            button_add_favorites.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    toastShow("已经添加到收藏了哦(*^▽^*)\n" +
+                            "如果需要取消收藏，请到收藏页面长按取消");
+                }
+            });
+            button_add_favorites.setText("已添加到收藏");
+        }
+    }
+
+    /**
+     * 处理程序开始按钮
+     *
+     * @param cartoonHistory 卡通历史
+     * @param button_start   按钮开始
+     * @param name           名字
+     * @param author         作者
+     * @param imgUrl         img url
+     */
+    private void handlerStartButton(CartoonHistory cartoonHistory, Button button_start, String name, String author, String imgUrl)
+    {
+        if (cartoonHistory == null)
+        {
+            //没有历史记录，从第一章开始阅读
+//            if (cartoonItemList.size() == 0)
+//            {
+//                toastShow("当前漫画没有章节");
+//            }
+//            else
+            {
+                button_start.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        CartoonItem cartoonItem;
+                        try
+                        {
+                            cartoonItem = cartoonItemList.get(cartoonItemList.size() - 1);
+                        }
+                        catch (NullPointerException e)
+                        {
+                            toastShow("当前漫画没有章节");
+                            return;
+                        }
+                        String id2 = cartoonItem.getId();
+                        String html = URLConstant.baseUrl + CartoonItemActivity.this.id + "/" + id2 + ".html";
+                        Intent intent2 = new Intent(CartoonItemActivity.this, ContentActivity.class);
+                        intent2.putExtra("html", html);
+                        intent2.putExtra("name", name);
+                        intent2.putExtra("author", author);
+                        intent2.putExtra("imgUrl", imgUrl);
+                        Log.d(TAG, "onItemClick: html:" + html);
+                        startActivity(intent2);
+                    }
+                });
+            }
+        }
+        else
+        {
+            //有历史记录
+            button_start.setText("继续阅读");
+            button_start.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    String id2 = cartoonHistory.getId2();
+                    String html = URLConstant.baseUrl + CartoonItemActivity.this.id + "/" + id2 + ".html";
+                    Intent intent2 = new Intent(CartoonItemActivity.this, ContentActivity.class);
+                    intent2.putExtra("html", html);
+                    intent2.putExtra("name", name);
+                    intent2.putExtra("author", author);
+                    intent2.putExtra("imgUrl", imgUrl);
+                    Log.d(TAG, "onItemClick: html:" + html);
+                    startActivity(intent2);
+                }
+            });
+        }
+    }
+
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        MainApplication.getInstance().getThreadPool().submit(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(CartoonItemActivity.this);
+                CartoonHistory cartoonHistory = cartoonHistoryDao.queryById(id);
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        handlerStartButton(cartoonHistory, button_start, name, author, imgUrl);
+                    }
+                });
             }
         });
     }
