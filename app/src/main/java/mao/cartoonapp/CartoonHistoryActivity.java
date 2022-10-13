@@ -35,6 +35,8 @@ public class CartoonHistoryActivity extends AppCompatActivity
      * 标签
      */
     private static final String TAG = "CartoonHistoryActivity";
+    private ListView listView;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,8 +45,14 @@ public class CartoonHistoryActivity extends AppCompatActivity
         setContentView(R.layout.activity_cartoon_history);
 
 
-        ListView listView = findViewById(R.id.ListView);
-        TextView textView = findViewById(R.id.TextView);
+        listView = findViewById(R.id.ListView);
+        textView = findViewById(R.id.TextView);
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
 
         MainApplication.getInstance().getThreadPool().submit(new Runnable()
         {
@@ -124,7 +132,6 @@ public class CartoonHistoryActivity extends AppCompatActivity
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)

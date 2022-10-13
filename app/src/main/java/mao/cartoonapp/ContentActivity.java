@@ -102,17 +102,23 @@ public class ContentActivity extends AppCompatActivity
                                             .setAuthor(author)
                                             .setImgUrl(imgUrl);
                                     boolean b = cartoonHistoryDao.insertOrUpdate(cartoonHistory);
-                                    if (!b)
+                                    Log.d(TAG, "run: 历史记录：" + cartoonHistory);
+                                    runOnUiThread(new Runnable()
                                     {
-                                        runOnUiThread(new Runnable()
+                                        @Override
+                                        public void run()
                                         {
-                                            @Override
-                                            public void run()
+                                            if (!b)
                                             {
                                                 toastShow("历史记录更新失败");
                                             }
-                                        });
-                                    }
+                                            else
+                                            {
+                                                Log.d(TAG, "run: 历史记录更新成功");
+                                                //toastShow("更新历史记录");
+                                            }
+                                        }
+                                    });
                                 }
                                 catch (Exception e)
                                 {
