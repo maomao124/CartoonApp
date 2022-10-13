@@ -66,7 +66,7 @@ public class CartoonHistoryActivity extends AppCompatActivity
                 try
                 {
                     CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(CartoonHistoryActivity.this);
-                    cartoonHistoryList = cartoonHistoryDao.queryAll();
+                    cartoonHistoryList = cartoonHistoryDao.queryAllByLastTimeDesc();
                     Log.d(TAG, "run: 历史记录：" + cartoonHistoryList);
                     if (cartoonHistoryList.size() == 0)
                     {

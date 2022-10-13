@@ -152,6 +152,7 @@ public class CartoonHistoryDao extends SQLiteOpenHelper
                 "id2 VARCHAR NOT NULL," +
                 "name VARCHAR NOT NULL," +
                 "author VARCHAR NOT NULL," +
+                "lastTime INTEGER NOT NULL," +
                 "imgUrl VARCHAR NOT NULL)";
         db.execSQL(sql);
     }
@@ -180,6 +181,28 @@ public class CartoonHistoryDao extends SQLiteOpenHelper
         List<CartoonHistory> list = new ArrayList<>();
 
         Cursor cursor = readDatabase.query(TABLE_NAME, null, "1=1", new String[]{}, null, null, null);
+
+        while (cursor.moveToNext())
+        {
+            CartoonHistory cartoonHistory = new CartoonHistory();
+            setCartoonHistory(cursor, cartoonHistory);
+            list.add(cartoonHistory);
+        }
+
+        cursor.close();
+        return list;
+    }
+
+    /**
+     * 查询所有,并按更新时间的降序排序
+     *
+     * @return {@link List}<{@link CartoonHistory}>
+     */
+    public List<CartoonHistory> queryAllByLastTimeDesc()
+    {
+        List<CartoonHistory> list = new ArrayList<>();
+
+        Cursor cursor = readDatabase.query(TABLE_NAME, null, "1=1", new String[]{}, null, null, "lastTime desc");
 
         while (cursor.moveToNext())
         {
@@ -323,6 +346,7 @@ public class CartoonHistoryDao extends SQLiteOpenHelper
         contentValues.put("id2", cartoonHistory.getId2());
         contentValues.put("name", cartoonHistory.getName());
         contentValues.put("author", cartoonHistory.getAuthor());
+        contentValues.put("lastTime", cartoonHistory.getLastTime());
         contentValues.put("imgUrl", cartoonHistory.getImgUrl());
     }
 
@@ -338,7 +362,8 @@ public class CartoonHistoryDao extends SQLiteOpenHelper
         cartoonHistory.setId2(cursor.getString(1));
         cartoonHistory.setName(cursor.getString(2));
         cartoonHistory.setAuthor(cursor.getString(3));
-        cartoonHistory.setImgUrl(cursor.getString(4));
+        cartoonHistory.setLastTime(cursor.getLong(4));
+        cartoonHistory.setImgUrl(cursor.getString(5));
         return cartoonHistory;
     }
 

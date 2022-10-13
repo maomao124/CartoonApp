@@ -14,6 +14,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +31,7 @@ public class ContentActivity extends AppCompatActivity
      * 标签
      */
     private static final String TAG = "ContentActivity";
+    private WebView webView;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -56,7 +59,7 @@ public class ContentActivity extends AppCompatActivity
         Log.d(TAG, "onCreate: name:" + name);
         Log.d(TAG, "onCreate: author:" + author);
 
-        WebView webView = findViewById(R.id.WebView);
+        webView = findViewById(R.id.WebView);
 
         webView.setWebViewClient(new WebViewClient()
         {
@@ -100,6 +103,7 @@ public class ContentActivity extends AppCompatActivity
                                             .setId2(id2)
                                             .setName(name)
                                             .setAuthor(author)
+                                            .setLastTime(new Date().getTime())
                                             .setImgUrl(imgUrl);
                                     boolean b = cartoonHistoryDao.insertOrUpdate(cartoonHistory);
                                     Log.d(TAG, "run: 历史记录：" + cartoonHistory);
@@ -149,6 +153,36 @@ public class ContentActivity extends AppCompatActivity
         webView.getSettings().setAppCacheEnabled(true);//是否使用缓存
 
         webView.loadUrl(html);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        menu.add(1, 1, 1, "刷新");
+        menu.add(1, 2, 2, "页面返回");
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        int id = item.getItemId();
+        if (id == 1)
+        {
+            webView.reload();
+        }
+        else if (id == 2)
+        {
+            if (webView.canGoBack())
+            {
+                webView.goBack();
+            }
+            else
+            {
+                toastShow("页面不能再回退了");
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

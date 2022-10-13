@@ -35,6 +35,11 @@ public class CartoonHistory
     private String author;
 
     /**
+     * 最后一次更新时间
+     */
+    private Long lastTime;
+
+    /**
      * img url
      */
     private String imgUrl;
@@ -50,18 +55,20 @@ public class CartoonHistory
     /**
      * Instantiates a new Cartoon history.
      *
-     * @param id1    the id 1
-     * @param id2    the id 2
-     * @param name   the name
-     * @param author the author
-     * @param imgUrl the img url
+     * @param id1      the id 1
+     * @param id2      the id 2
+     * @param name     the name
+     * @param author   the author
+     * @param lastTime the last time
+     * @param imgUrl   the img url
      */
-    public CartoonHistory(String id1, String id2, String name, String author, String imgUrl)
+    public CartoonHistory(String id1, String id2, String name, String author, Long lastTime, String imgUrl)
     {
         this.id1 = id1;
         this.id2 = id2;
         this.name = name;
         this.author = author;
+        this.lastTime = lastTime;
         this.imgUrl = imgUrl;
     }
 
@@ -154,6 +161,28 @@ public class CartoonHistory
     }
 
     /**
+     * Gets last time.
+     *
+     * @return the last time
+     */
+    public Long getLastTime()
+    {
+        return lastTime;
+    }
+
+    /**
+     * Sets last time.
+     *
+     * @param lastTime the last time
+     * @return the last time
+     */
+    public CartoonHistory setLastTime(Long lastTime)
+    {
+        this.lastTime = lastTime;
+        return this;
+    }
+
+    /**
      * Gets img url.
      *
      * @return the img url
@@ -205,6 +234,10 @@ public class CartoonHistory
         {
             return false;
         }
+        if (getLastTime() != null ? !getLastTime().equals(that.getLastTime()) : that.getLastTime() != null)
+        {
+            return false;
+        }
         return getImgUrl() != null ? getImgUrl().equals(that.getImgUrl()) : that.getImgUrl() == null;
     }
 
@@ -215,6 +248,7 @@ public class CartoonHistory
         result = 31 * result + (getId2() != null ? getId2().hashCode() : 0);
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (getAuthor() != null ? getAuthor().hashCode() : 0);
+        result = 31 * result + (getLastTime() != null ? getLastTime().hashCode() : 0);
         result = 31 * result + (getImgUrl() != null ? getImgUrl().hashCode() : 0);
         return result;
     }
@@ -228,6 +262,7 @@ public class CartoonHistory
         stringbuilder.append("id2：").append(id2).append('\n');
         stringbuilder.append("name：").append(name).append('\n');
         stringbuilder.append("author：").append(author).append('\n');
+        stringbuilder.append("lastTime：").append(lastTime).append('\n');
         stringbuilder.append("imgUrl：").append(imgUrl).append('\n');
         return stringbuilder.toString();
     }
