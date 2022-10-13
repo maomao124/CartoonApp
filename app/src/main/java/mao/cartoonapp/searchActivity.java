@@ -3,10 +3,13 @@ package mao.cartoonapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -16,6 +19,7 @@ import java.util.List;
 
 import mao.cartoonapp.adapter.CartoonListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
+import mao.cartoonapp.dao.CartoonFavoritesDao;
 import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.service.CartoonService;
 
@@ -26,6 +30,7 @@ public class searchActivity extends AppCompatActivity
      * 标签
      */
     private static final String TAG = "searchActivity";
+    private List<Cartoon> cartoonList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,7 +60,7 @@ public class searchActivity extends AppCompatActivity
                         try
                         {
                             CartoonService cartoonService = MainApplication.getInstance().getCartoonService();
-                            List<Cartoon> cartoonList = cartoonService.search(keyword);
+                            cartoonList = cartoonService.search(keyword);
                             Log.d(TAG, "run: 搜索结果：\n" + cartoonList);
                             if (cartoonList.size() == 0)
                             {
@@ -102,6 +107,59 @@ public class searchActivity extends AppCompatActivity
                         }
                     }
                 });
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList.get(position);
+                String id1 = cartoon.getId();
+                String name = cartoon.getName();
+                String author = cartoon.getAuthor();
+                String imgUrl = cartoon.getImgUrl();
+                Intent intent = new Intent(searchActivity.this, CartoonItemActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("id", id1);
+                bundle.putString("name", name);
+                bundle.putString("author", author);
+                bundle.putString("imgUrl", imgUrl);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener()
+        {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                Cartoon cartoon = cartoonList.get(position);
+                new AlertDialog.Builder(searchActivity.this)
+                        .setTitle("提示")
+                        .setMessage("是否将漫画”" + cartoon.getName() + "“加入到收藏夹？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                boolean insert = CartoonFavoritesDao.getInstance(searchActivity.this).insert(cartoon);
+                                if (insert)
+                                {
+                                    toastShow("加入成功");
+                                }
+                                else
+                                {
+                                    toastShow("加入失败");
+                                }
+                            }
+                        })
+                        .setNeutralButton("否", null)
+                        .create()
+                        .show();
+                return true;
             }
         });
     }
