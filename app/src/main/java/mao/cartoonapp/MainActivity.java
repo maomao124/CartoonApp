@@ -142,7 +142,10 @@ public class MainActivity extends AppCompatActivity
                                 "v1.1：\n" +
                                 "1.优化搜索页面结果显示，还是异步加载，但是分成了两阶段\n" +
                                 "2.主题由安卓默认颜色更改成#00ccff(天蓝色)\n" +
-                                "")
+                                "3.漫画详情页面底部添加了两个按钮\n" +
+                                "4.漫画详情页面添加了漫画加入到收藏功能\n" +
+                                "5.漫画详情页面添加了开始阅读或者继续阅读功能\n" +
+                                "6.历史记录页面添加了最近阅读时间显示，原为remark字段")
                         .setPositiveButton("我知道了", null)
                         .create()
                         .show();

@@ -3,6 +3,7 @@ package mao.cartoonapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,8 +18,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import mao.cartoonapp.adapter.CartoonListViewAdapter;
@@ -76,11 +79,16 @@ public class CartoonHistoryActivity extends AppCompatActivity
                     cartoonList = new ArrayList<>(cartoonHistoryList.size());
                     for (CartoonHistory cartoonHistory : cartoonHistoryList)
                     {
+                        Date date = new Date();
+                        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat =
+                                new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss");
+                        date.setTime(cartoonHistory.getLastTime());
+
                         Cartoon cartoon = new Cartoon()
                                 .setId(cartoonHistory.getId1())
                                 .setName(cartoonHistory.getName())
                                 .setAuthor(cartoonHistory.getAuthor())
-                                .setRemarks("")
+                                .setRemarks(simpleDateFormat.format(date))
                                 .setImgUrl(cartoonHistory.getImgUrl());
                         Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
                         cartoon.setBitmap(bitmap);
