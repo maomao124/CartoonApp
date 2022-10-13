@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, searchActivity.class));
                 break;
             case 2:
-                toastShow("未实现历史记录功能，也不想实现");
+                startActivity(new Intent(this, CartoonHistoryActivity.class));
                 break;
             case 3:
                 startActivity(new Intent(this, FavoritesActivity.class));
