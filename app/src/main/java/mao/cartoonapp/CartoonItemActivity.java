@@ -136,6 +136,7 @@ public class CartoonItemActivity extends AppCompatActivity
                 intent2.putExtra("html", html);
                 intent2.putExtra("name", name);
                 intent2.putExtra("author", author);
+                intent2.putExtra("imgUrl", imgUrl);
                 Log.d(TAG, "onItemClick: html:" + html);
                 startActivity(intent2);
             }

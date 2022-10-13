@@ -17,11 +17,17 @@ import android.widget.Toast;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.constant.URLConstant;
+import mao.cartoonapp.dao.CartoonHistoryDao;
+import mao.cartoonapp.entity.CartoonHistory;
 
 public class ContentActivity extends AppCompatActivity
 {
 
+    /**
+     * 标签
+     */
     private static final String TAG = "ContentActivity";
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -41,6 +47,7 @@ public class ContentActivity extends AppCompatActivity
         String html = bundle.getString("html");
         String name = bundle.getString("name");
         String author = bundle.getString("author");
+        String imgUrl = bundle.getString("imgUrl");
         if (html == null)
         {
             toastShow("获取不到数据");
@@ -77,9 +84,49 @@ public class ContentActivity extends AppCompatActivity
                     String[] split = substring.split("/");
                     if (split.length == 2)
                     {
-                        String id1 = split[0];
-                        String id2 = split[1];
-                        Log.d(TAG, "onLoadResource: " + id1 + "," + id2);
+                        CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(ContentActivity.this);
+                        MainApplication.getInstance().getThreadPool().submit(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    String id1 = split[0];
+                                    String id2 = split[1];
+                                    Log.d(TAG, "onLoadResource: " + id1 + "," + id2);
+                                    CartoonHistory cartoonHistory = new CartoonHistory()
+                                            .setId1(id1)
+                                            .setId2(id2)
+                                            .setName(name)
+                                            .setAuthor(author)
+                                            .setImgUrl(imgUrl);
+                                    boolean b = cartoonHistoryDao.insertOrUpdate(cartoonHistory);
+                                    if (!b)
+                                    {
+                                        runOnUiThread(new Runnable()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                toastShow("历史记录更新失败");
+                                            }
+                                        });
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    runOnUiThread(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            toastShow("历史记录更新失败");
+                                        }
+                                    });
+                                }
+                            }
+                        });
                     }
                 }
                 super.onLoadResource(view, url);

@@ -149,9 +149,10 @@ public class CartoonHistoryDao extends SQLiteOpenHelper
 
         String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 "id1 VARCHAR PRIMARY KEY NOT NULL," +
-                " id2 VARCHAR NOT NULL," +
-                " name VARCHAR NOT NULL," +
-                " author VARCHAR NOT NULL)";
+                "id2 VARCHAR NOT NULL," +
+                "name VARCHAR NOT NULL," +
+                "author VARCHAR NOT NULL," +
+                "imgUrl VARCHAR NOT NULL)";
         db.execSQL(sql);
     }
 
@@ -307,7 +308,11 @@ public class CartoonHistoryDao extends SQLiteOpenHelper
      */
     private void setContentValues(CartoonHistory cartoonHistory, ContentValues contentValues)
     {
-        //todo:填充contentValues
+        contentValues.put("id1", cartoonHistory.getId1());
+        contentValues.put("id2", cartoonHistory.getId2());
+        contentValues.put("name", cartoonHistory.getName());
+        contentValues.put("author", cartoonHistory.getAuthor());
+        contentValues.put("imgUrl", cartoonHistory.getImgUrl());
     }
 
     /**
@@ -318,8 +323,11 @@ public class CartoonHistoryDao extends SQLiteOpenHelper
      */
     private CartoonHistory setCartoonHistory(Cursor cursor, CartoonHistory cartoonHistory)
     {
-        //todo:填充CartoonHistory
-
+        cartoonHistory.setId1(cursor.getString(0));
+        cartoonHistory.setId2(cursor.getString(1));
+        cartoonHistory.setName(cursor.getString(2));
+        cartoonHistory.setAuthor(cursor.getString(3));
+        cartoonHistory.setImgUrl(cursor.getString(4));
         return cartoonHistory;
     }
 

@@ -22,6 +22,7 @@ import android.widget.Toast;
 import mao.cartoonapp.adapter.CartoonViewPagerAdapter;
 
 import mao.cartoonapp.dao.CartoonFavoritesDao;
+import mao.cartoonapp.dao.CartoonHistoryDao;
 
 
 public class MainActivity extends AppCompatActivity
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity
      */
     private long exitTime = 0;
     private CartoonFavoritesDao cartoonFavoritesDao;
+    private CartoonHistoryDao cartoonHistoryDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -60,6 +62,9 @@ public class MainActivity extends AppCompatActivity
         cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
         cartoonFavoritesDao.openReadConnection();
         cartoonFavoritesDao.openWriteConnection();
+        cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
+        cartoonHistoryDao.openReadConnection();
+        cartoonHistoryDao.openWriteConnection();
     }
 
     @Override
@@ -93,10 +98,11 @@ public class MainActivity extends AppCompatActivity
                 new AlertDialog.Builder(this)
                         .setTitle("说明")
                         .setMessage("1.长按列表项可以添加漫画到收藏夹\n" +
-                                "2.开发此软件目的是为了学习安卓\n" +
-                                "3.收藏夹页面长按列表项可以取消收藏\n" +
-                                "4.作者QQ：1296193245\n" +
-                                "5.作者github：https://github.com/maomao124/")
+                                "2.搜索页面长按列表项也可以收藏\n" +
+                                "3.开发此软件目的是为了学习安卓\n" +
+                                "4.收藏夹页面长按列表项可以取消收藏\n" +
+                                "5.作者QQ：1296193245\n" +
+                                "6.作者github：https://github.com/maomao124/")
                         .setPositiveButton("我知道了", null)
                         .create()
                         .show();
@@ -112,6 +118,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onDestroy();
         cartoonFavoritesDao.closeConnection();
+        cartoonHistoryDao.closeConnection();
     }
 
     /**

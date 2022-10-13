@@ -1,5 +1,6 @@
 package mao.cartoonapp.entity;
 
+
 /**
  * Project name(项目名称)：CartoonApp
  * Package(包名): mao.cartoonapp.entity
@@ -34,6 +35,11 @@ public class CartoonHistory
     private String author;
 
     /**
+     * img url
+     */
+    private String imgUrl;
+
+    /**
      * Instantiates a new Cartoon history.
      */
     public CartoonHistory()
@@ -48,13 +54,15 @@ public class CartoonHistory
      * @param id2    the id 2
      * @param name   the name
      * @param author the author
+     * @param imgUrl the img url
      */
-    public CartoonHistory(String id1, String id2, String name, String author)
+    public CartoonHistory(String id1, String id2, String name, String author, String imgUrl)
     {
         this.id1 = id1;
         this.id2 = id2;
         this.name = name;
         this.author = author;
+        this.imgUrl = imgUrl;
     }
 
     /**
@@ -145,6 +153,28 @@ public class CartoonHistory
         return this;
     }
 
+    /**
+     * Gets img url.
+     *
+     * @return the img url
+     */
+    public String getImgUrl()
+    {
+        return imgUrl;
+    }
+
+    /**
+     * Sets img url.
+     *
+     * @param imgUrl the img url
+     * @return the img url
+     */
+    public CartoonHistory setImgUrl(String imgUrl)
+    {
+        this.imgUrl = imgUrl;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o)
     {
@@ -171,7 +201,11 @@ public class CartoonHistory
         {
             return false;
         }
-        return getAuthor() != null ? getAuthor().equals(that.getAuthor()) : that.getAuthor() == null;
+        if (getAuthor() != null ? !getAuthor().equals(that.getAuthor()) : that.getAuthor() != null)
+        {
+            return false;
+        }
+        return getImgUrl() != null ? getImgUrl().equals(that.getImgUrl()) : that.getImgUrl() == null;
     }
 
     @Override
@@ -181,6 +215,7 @@ public class CartoonHistory
         result = 31 * result + (getId2() != null ? getId2().hashCode() : 0);
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (getAuthor() != null ? getAuthor().hashCode() : 0);
+        result = 31 * result + (getImgUrl() != null ? getImgUrl().hashCode() : 0);
         return result;
     }
 
@@ -193,6 +228,7 @@ public class CartoonHistory
         stringbuilder.append("id2：").append(id2).append('\n');
         stringbuilder.append("name：").append(name).append('\n');
         stringbuilder.append("author：").append(author).append('\n');
+        stringbuilder.append("imgUrl：").append(imgUrl).append('\n');
         return stringbuilder.toString();
     }
 }
