@@ -19,6 +19,8 @@ public class URLConstant
     public static final String host = "m.qiman57.com";
     public static final String bookChapterUrl = "http://m.qiman57.com/bookchapter/";
 
+    public static final String searchUrl = "http://m.qiman57.com/spotlight/?keyword=";
+
     public static final String rank1Name = "日热门榜";
     public static final String rankUrl1 = "http://m.qiman57.com/rank/1-1.html";
     public static final int rankUrl1Type = 1;

@@ -65,9 +65,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        menu.add(1, 1, 1, "历史记录");
-        menu.add(1, 2, 2, "漫画收藏夹");
-        menu.add(1, 3, 3, "软件说明");
+        menu.add(1, 1, 1, "漫画搜索");
+        menu.add(1, 2, 2, "历史记录");
+        menu.add(1, 3, 3, "漫画收藏夹");
+        menu.add(1, 4, 4, "软件说明");
         menu.add(1, 999, 999, "退出");
 
         return true;
@@ -80,12 +81,15 @@ public class MainActivity extends AppCompatActivity
         switch (id)
         {
             case 1:
-                toastShow("未实现历史记录功能，也不想实现");
+                toastShow("未实现");
                 break;
             case 2:
-                startActivity(new Intent(this, FavoritesActivity.class));
+                toastShow("未实现历史记录功能，也不想实现");
                 break;
             case 3:
+                startActivity(new Intent(this, FavoritesActivity.class));
+                break;
+            case 4:
                 new AlertDialog.Builder(this)
                         .setTitle("说明")
                         .setMessage("1.长按列表项可以添加漫画到收藏夹\n" +

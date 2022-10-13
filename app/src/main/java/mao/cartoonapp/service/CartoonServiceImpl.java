@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Project name(项目名称)：解析漫画网站
@@ -152,5 +153,64 @@ public class CartoonServiceImpl implements CartoonService
         String body = "id=" + id + "&id2=1";
         String s = http.request(URLConstant.bookChapterUrl, "POST", map, body);
         return JSON.parseArray(s, CartoonItem.class);
+    }
+
+
+    /**
+     * 搜索
+     *
+     * @param keyword 关键字
+     * @return {@link List}<{@link Cartoon}>
+     */
+    @Override
+    public List<Cartoon> search(String keyword)
+    {
+        List<Cartoon> list = new ArrayList<>();
+        Map<String, String> map = new HashMap<>();
+        map.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.37");
+        map.put("Host", URLConstant.host);
+        String url = URLConstant.searchUrl + keyword;
+        String html = http.GET(url, map);
+        if (html == null)
+        {
+            return list;
+        }
+        Document document = Jsoup.parse(html);
+        //System.out.println(document);
+        Element element = document.getElementsByClass("search-result").first();
+        //System.out.println(element);
+        if (element == null)
+        {
+            return list;
+        }
+        Elements elements = element.getElementsByClass("comic-list-item clearfix");
+        //System.out.println(elements.size() + "\n\n");
+        //System.out.println(elements);
+        for (Element element1 : elements)
+        {
+            String id = element1.attr("data-cid");
+            //System.out.println(id);
+            Element img = element1.getElementsByTag("img").first();
+            //System.out.println(img);
+            String imgUrl;
+            imgUrl = img != null ? img.attr("src") : null;
+            String name = Objects.requireNonNull(Objects.requireNonNull(element1.getElementsByClass("comic-name").
+                    first()).getElementsByTag("a").first()).html();
+            String author = Objects.requireNonNull(element1.getElementsByClass("comic-author").first()).html();
+            String remarks = Objects.requireNonNull(element1.getElementsByClass("comic-update-at").first()).html();
+            //System.out.println(imgUrl);
+            //System.out.println(name);
+            //System.out.println(author);
+            //System.out.println(remarks);
+            Cartoon cartoon = new Cartoon()
+                    .setId(id)
+                    .setName(name)
+                    .setAuthor(author)
+                    .setRemarks(remarks)
+                    .setImgUrl(imgUrl);
+            list.add(cartoon);
+        }
+        return list;
     }
 }

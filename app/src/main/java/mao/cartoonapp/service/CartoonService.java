@@ -25,4 +25,12 @@ public interface CartoonService
     List<Cartoon> getCartoonList(String urlString, int type);
 
     List<CartoonItem> getCartoonItem(int id);
+
+    /**
+     * 搜索
+     *
+     * @param keyword 关键字
+     * @return {@link List}<{@link Cartoon}>
+     */
+    List<Cartoon> search(String keyword);
 }
