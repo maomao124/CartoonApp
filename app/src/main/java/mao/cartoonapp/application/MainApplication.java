@@ -97,6 +97,11 @@ public class MainApplication extends Application
      */
     private Thread updateThread;
 
+    /**
+     * 获取更新失败计数
+     */
+    private int count;
+
 
     public ExecutorService getThreadPool()
     {
@@ -218,6 +223,11 @@ public class MainApplication extends Application
         VersionInfo versionInfo = updateService.getVersionInfo();
         if (versionInfo == null)
         {
+            if (count > 100)
+            {
+                return;
+            }
+            count++;
             getVersionInfo();
         }
         else

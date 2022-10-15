@@ -143,10 +143,16 @@ public class MainActivity extends AppCompatActivity
                                 "9.作者QQ：1296193245\n" +
                                 "10.作者github：https://github.com/maomao124/" +
                                 "\n\n" +
-                                "当前版本：v1.2" +
+                                "当前版本：v1.3" +
                                 "\n\n\n" +
                                 "版本更新说明：" +
                                 "\n\n" +
+                                "\n" +
+                                "\n" +
+                                "v1.3：\n" +
+                                "2022/10/14\n" +
+                                "1.修复点击给项目点赞的菜单选项后会退出程序的问题\n" +
+                                "2.优化后台更新服务\n" +
                                 "\n" +
                                 "\n" +
                                 "v1.2：\n" +
@@ -181,6 +187,7 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                break;
             case 999:
                 finish();
         }
