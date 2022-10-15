@@ -1,6 +1,9 @@
 package mao.cartoonapp.adapter;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,7 @@ import java.util.List;
 
 import mao.cartoonapp.R;
 import mao.cartoonapp.entity.Cartoon;
+import mao.cartoonapp.entity.CartoonHistory;
 import mao.cartoonapp.entity.CartoonItem;
 
 /**
@@ -29,14 +33,50 @@ import mao.cartoonapp.entity.CartoonItem;
 public class CartoonItemListViewAdapter extends BaseAdapter
 {
 
+    /**
+     * 标签
+     */
+    private static final String TAG = "CartoonItemListViewAdapter";
+
     private final Context context;
 
+
     private final List<CartoonItem> cartoonItemList;
+
+    /**
+     * 文本视图id默认颜色
+     */
+    private final int textViewIdDefaultColor;
+
+    /**
+     * 文本视图名称默认颜色
+     */
+    private final int textViewNameDefaultColor;
+
+    /**
+     * 历史
+     */
+    private CartoonHistory cartoonHistory;
 
     public CartoonItemListViewAdapter(Context context, List<CartoonItem> cartoonItemList)
     {
         this.context = context;
         this.cartoonItemList = cartoonItemList;
+        View view = LayoutInflater.from(context).inflate(R.layout.item_cartoonitem, null);
+        //获取默认颜色
+        TextView textViewId = view.findViewById(R.id.id);
+        TextView textViewName = view.findViewById(R.id.name);
+        ColorStateList textColors = textViewId.getTextColors();
+        textViewIdDefaultColor = textColors.getDefaultColor();
+        ColorStateList textColors1 = textViewName.getTextColors();
+        textViewNameDefaultColor = textColors1.getDefaultColor();
+    }
+
+
+    public CartoonItemListViewAdapter setCartoonHistory(CartoonHistory cartoonHistory)
+    {
+        this.cartoonHistory = cartoonHistory;
+        return this;
     }
 
     @Override
@@ -77,6 +117,22 @@ public class CartoonItemListViewAdapter extends BaseAdapter
         String textViewId = cartoonItem.getTextViewId();
         cartoonItemListViewHolder.textViewId.setText(textViewId);
         cartoonItemListViewHolder.name.setText(cartoonItem.getName());
+        if (cartoonHistory != null)
+        {
+            if (cartoonHistory.getId2().equals(cartoonItem.getId()))
+            {
+                Log.d(TAG, "getView: 加载到历史记录的位置：" +
+                        "" + cartoonHistory.getId2() + "，" + cartoonItem.getId() + "," + cartoonItem.getName());
+                //当前历史记录的位置
+                cartoonItemListViewHolder.textViewId.setTextColor(Color.rgb(255, 160, 200));
+                cartoonItemListViewHolder.name.setTextColor(Color.rgb(255, 160, 200));
+            }
+            else
+            {
+                cartoonItemListViewHolder.textViewId.setTextColor(textViewIdDefaultColor);
+                cartoonItemListViewHolder.name.setTextColor(textViewNameDefaultColor);
+            }
+        }
         return convertView;
     }
 

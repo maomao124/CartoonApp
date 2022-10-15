@@ -102,6 +102,20 @@ public class ContentActivity extends AppCompatActivity
             }
 
             @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon)
+            {
+                Log.d(TAG, "onPageStarted: 网页url:" + url);
+                Pattern pattern = Pattern.compile(URLConstant.baseUrl + "\\d+/\\d+.html");
+                Matcher matcher = pattern.matcher(url);
+                boolean result = matcher.matches();
+                if (!result)
+                {
+                    toastShow("观看完毕，返回");
+                    finish();
+                }
+            }
+
+            @Override
             public void onLoadResource(WebView view, String url)
             {
                 //http://m.qiman57.com/21429/1413472.html

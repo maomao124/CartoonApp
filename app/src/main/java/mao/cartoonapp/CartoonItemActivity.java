@@ -87,7 +87,8 @@ public class CartoonItemActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                Bitmap bitmap = openImageByHTTP(imgUrl);
+                Bitmap bitmap = MainApplication.getInstance().
+                        loadImage(new Cartoon().setId(id).setImgUrl(imgUrl));
                 runOnUiThread(new Runnable()
                 {
                     @Override
@@ -119,6 +120,10 @@ public class CartoonItemActivity extends AppCompatActivity
                         //Log.d(TAG, "run: " + textViewId);
                     }
                     cartoonItemListViewAdapter = new CartoonItemListViewAdapter(CartoonItemActivity.this, cartoonItemList);
+                    //加载历史记录
+                    CartoonHistory cartoonHistory = CartoonHistoryDao.getInstance(CartoonItemActivity.this).queryById(id);
+                    Log.d(TAG, "run: 历史记录：\n" + cartoonHistory);
+                    cartoonItemListViewAdapter.setCartoonHistory(cartoonHistory);
                     runOnUiThread(new Runnable()
                     {
                         @Override
@@ -371,49 +376,4 @@ public class CartoonItemActivity extends AppCompatActivity
     }
 
 
-    /**
-     * 从网络上加载图片
-     *
-     * @param imgUrl img url
-     * @return {@link Bitmap}
-     */
-    public Bitmap openImageByHTTP(String imgUrl)
-    {
-        Bitmap bitmap;
-        InputStream inputStream = null;
-        HttpURLConnection httpURLConnection = null;
-        try
-        {
-            URL url = new URL(imgUrl);
-            httpURLConnection = (HttpURLConnection) url.openConnection();
-            inputStream = httpURLConnection.getInputStream();
-            bitmap = BitmapFactory.decodeStream(inputStream);
-            return bitmap;
-        }
-        catch (Exception e)
-        {
-            //加载失败，直接加载默认的图片
-            Log.e(TAG, "openImageByHTTP: ", e);
-            bitmap = BitmapFactory.decodeResource(this.getResources(), R.mipmap.ic_launcher_round);
-            return bitmap;
-        }
-        finally
-        {
-            try
-            {
-                if (inputStream != null)
-                {
-                    inputStream.close();
-                }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-            if (httpURLConnection != null)
-            {
-                httpURLConnection.disconnect();
-            }
-        }
-    }
 }
