@@ -15,8 +15,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +29,7 @@ import android.widget.Toast;
 import mao.cartoonapp.adapter.CartoonViewPagerAdapter;
 
 import mao.cartoonapp.application.MainApplication;
+import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.dao.CartoonFavoritesDao;
 import mao.cartoonapp.dao.CartoonHistoryDao;
 
@@ -92,6 +95,7 @@ public class MainActivity extends AppCompatActivity
         menu.add(1, 3, 3, "漫画收藏夹");
         menu.add(1, 4, 4, "软件说明");
         menu.add(1, 5, 5, "检查更新");
+        menu.add(1, 6, 6, "给项目点赞");
         menu.add(1, 999, 999, "退出");
 
         return true;
@@ -151,7 +155,8 @@ public class MainActivity extends AppCompatActivity
                                 "2.给漫画目录页面的大图也添加本地缓存，优先从本地缓存去取，而不是直接从资源服务器上加载，" +
                                 "之前调错方法了，参数和返回值都一样\n" +
                                 "3.漫画目录页面支持显示正在观看的章节目录了，用其它颜色标注\n" +
-                                "4.软件添加软件更新检查功能，本人没有后端服务器和公网ip，使用的是github上的服务器，解析的是html来实现更新" +
+                                "4.软件添加软件更新检查功能，本人没有后端服务器和公网ip，使用的是github上的服务器，通过解析html来实现更新\n" +
+                                "5.主菜单页面添加一个给项目点赞的菜单选项" +
                                 "\n" +
                                 "\n\n" +
                                 "v1.1：\n" +
@@ -171,6 +176,11 @@ public class MainActivity extends AppCompatActivity
                 toastShow("后台检查更新中");
                 MainApplication.getInstance().runUpdateThread(this);
                 break;
+            case 6:
+                Uri uri = Uri.parse(URLConstant.projectUrl);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             case 999:
                 finish();
         }
@@ -181,6 +191,7 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy()
     {
         super.onDestroy();
+        Log.i(TAG, "onDestroy: 软件即将关闭！！！");
         cartoonFavoritesDao.closeConnection();
         cartoonHistoryDao.closeConnection();
         unregisterReceiver(networkReceiver);
@@ -189,7 +200,14 @@ public class MainActivity extends AppCompatActivity
         if (updateThread.isAlive())
         {
             //直接强行关闭线程
-            updateThread.stop();
+            try
+            {
+                updateThread.stop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
     }
 

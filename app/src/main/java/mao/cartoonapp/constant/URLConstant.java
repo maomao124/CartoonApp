@@ -46,4 +46,6 @@ public class URLConstant
     public static final int rankUrl6Type = 6;
 
     public static final String updateUrl = "https://github.com/maomao124/CartoonApp";
+
+    public static final String projectUrl = "https://github.com/maomao124/CartoonApp";
 }

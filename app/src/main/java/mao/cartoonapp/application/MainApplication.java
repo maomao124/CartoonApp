@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import mao.cartoonapp.R;
+import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.entity.ImageLoadResult;
 import mao.cartoonapp.entity.VersionInfo;
@@ -245,7 +248,9 @@ public class MainApplication extends Application
                         @Override
                         public void onClick(DialogInterface dialog, int which)
                         {
-
+                            Uri uri = Uri.parse(URLConstant.projectUrl);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            startActivity(intent);
                         }
                     })
                     .setNegativeButton("取消", null)
@@ -269,7 +274,9 @@ public class MainApplication extends Application
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
-
+                        Uri uri = Uri.parse(URLConstant.projectUrl);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
                     }
                 })
                 .setNegativeButton("取消", null)
