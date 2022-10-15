@@ -1,10 +1,14 @@
 package mao.cartoonapp.application;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +20,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,10 +28,15 @@ import java.util.concurrent.Executors;
 import mao.cartoonapp.R;
 import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.entity.ImageLoadResult;
+import mao.cartoonapp.entity.VersionInfo;
+import mao.cartoonapp.net.HTTP;
 import mao.cartoonapp.net.RestfulHTTP;
+import mao.cartoonapp.net.SimpleHTTPImpl;
 import mao.cartoonapp.net.SimpleRestfulHTTPImpl;
 import mao.cartoonapp.service.CartoonService;
 import mao.cartoonapp.service.CartoonServiceImpl;
+import mao.cartoonapp.service.UpdateService;
+import mao.cartoonapp.service.UpdateServiceImpl;
 
 /**
  * Project name(项目名称)：CartoonApp
@@ -69,6 +79,21 @@ public class MainApplication extends Application
 
     private CartoonService cartoonService;
 
+    /**
+     * 更新服务
+     */
+    private UpdateService updateService;
+
+    /**
+     * 版本信息
+     */
+    private VersionInfo versionInfo;
+
+    /**
+     * 更新线程
+     */
+    private Thread updateThread;
+
 
     public ExecutorService getThreadPool()
     {
@@ -90,6 +115,15 @@ public class MainApplication extends Application
         return mainApplication;
     }
 
+    public UpdateService getUpdateService()
+    {
+        return updateService;
+    }
+
+    public Thread getUpdateThread()
+    {
+        return updateThread;
+    }
 
     @Override
     public void onCreate()
@@ -104,6 +138,13 @@ public class MainApplication extends Application
         http.setThreadPool(threadPool);
 
         cartoonService = new CartoonServiceImpl(http);
+
+        HTTP http = new SimpleHTTPImpl();
+        http.setThreadPool(threadPool);
+        http.setConnectTimeout(30000);
+        http.setReadTimeout(20000);
+
+        updateService = new UpdateServiceImpl(http);
     }
 
     /**
@@ -124,6 +165,116 @@ public class MainApplication extends Application
     {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "onConfigurationChanged: ");
+    }
+
+
+    public Thread runUpdateThread(Activity activity)
+    {
+        if (versionInfo != null)
+        {
+            checkVersion(activity);
+            return updateThread;
+        }
+
+        if (updateThread != null && (updateThread.getState() == Thread.State.RUNNABLE
+                || updateThread.getState() == Thread.State.BLOCKED ||
+                updateThread.getState() == Thread.State.WAITING ||
+                updateThread.getState() == Thread.State.TIMED_WAITING ||
+                updateThread.getState() == Thread.State.NEW))
+        {
+            //线程正在运行
+            toastShow(activity, "更新线程还在运行");
+        }
+        else
+        {
+            //更新线程运行完毕或者更新线程没有运行过
+            updateThread = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    getVersionInfo();
+                    activity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            checkVersion(activity);
+                        }
+                    });
+                }
+            });
+            updateThread.start();
+        }
+        return updateThread;
+    }
+
+
+    private void getVersionInfo()
+    {
+        VersionInfo versionInfo = updateService.getVersionInfo();
+        if (versionInfo == null)
+        {
+            getVersionInfo();
+        }
+        else
+        {
+            this.versionInfo = versionInfo;
+        }
+    }
+
+    private void checkVersion(Activity activity)
+    {
+        if (versionInfo.getVersion() == null)
+        {
+            toastShow(activity, "无法获取版本信息");
+            return;
+        }
+        if (getString(R.string.version).equals(versionInfo.getVersion()))
+        {
+            toastShow(activity, "当前的版本是最新的版本");
+            return;
+        }
+        if (versionInfo.getVersionUpdateInfo() == null)
+        {
+            new AlertDialog.Builder(activity)
+                    .setTitle("更新提示")
+                    .setMessage("发现新版本!!!\n当前版本是" + getString(R.string.version) + "\n最新版本是" + versionInfo.getVersion())
+                    .setPositiveButton("去更新", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+
+                        }
+                    })
+                    .setNegativeButton("取消", null)
+                    .create()
+                    .show();
+            return;
+        }
+        List<String> versionUpdateInfo = versionInfo.getVersionUpdateInfo();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s : versionUpdateInfo)
+        {
+            stringBuilder.append(s).append("\n");
+        }
+        new AlertDialog.Builder(activity)
+                .setTitle("更新提示")
+                .setMessage("发现新版本!!!\n当前版本是" + getString(R.string.version) + "\n最新版本是" + versionInfo.getVersion() + "\n\n" +
+                        versionInfo.getVersion() + "版本更新信息：\n" +
+                        stringBuilder)
+                .setPositiveButton("去更新", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .create()
+                .show();
     }
 
 
@@ -267,5 +418,15 @@ public class MainApplication extends Application
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * 显示消息
+     *
+     * @param message 消息
+     */
+    private void toastShow(Activity activity, String message)
+    {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
     }
 }

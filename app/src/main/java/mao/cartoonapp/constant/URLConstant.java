@@ -44,4 +44,6 @@ public class URLConstant
     public static final String rank6Name = "新漫入库";
     public static final String rankUrl6 = "http://m.qiman57.com/rank/6-1.html";
     public static final int rankUrl6Type = 6;
+
+    public static final String updateUrl = "https://github.com/maomao124/CartoonApp";
 }
