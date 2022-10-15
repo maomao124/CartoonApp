@@ -250,6 +250,7 @@ public class MainApplication extends Application
                         {
                             Uri uri = Uri.parse(URLConstant.projectUrl);
                             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                         }
                     })
@@ -276,6 +277,7 @@ public class MainApplication extends Application
                     {
                         Uri uri = Uri.parse(URLConstant.projectUrl);
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     }
                 })
