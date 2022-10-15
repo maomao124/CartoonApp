@@ -337,6 +337,8 @@ public class CartoonItemActivity extends AppCompatActivity
                     @Override
                     public void run()
                     {
+                        cartoonItemListViewAdapter.setCartoonHistory(cartoonHistory);
+                        cartoonItemListViewAdapter.notifyDataSetChanged();
                         handlerStartButton(cartoonHistory, button_start, name, author, imgUrl);
                     }
                 });
