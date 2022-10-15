@@ -24,6 +24,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 import mao.cartoonapp.adapter.CartoonItemListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
@@ -49,6 +51,8 @@ public class CartoonItemActivity extends AppCompatActivity
     private String imgUrl;
     private Button button_add_favorites;
     private Button button_start;
+    private CountDownLatch countDownLatch;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -59,6 +63,8 @@ public class CartoonItemActivity extends AppCompatActivity
         listView = findViewById(R.id.ListView);
         button_add_favorites = findViewById(R.id.Button_add_favorites);
         button_start = findViewById(R.id.Button_start);
+
+        countDownLatch = new CountDownLatch(1);
 
         Intent intent = getIntent();
         if (intent == null)
@@ -124,6 +130,7 @@ public class CartoonItemActivity extends AppCompatActivity
                     CartoonHistory cartoonHistory = CartoonHistoryDao.getInstance(CartoonItemActivity.this).queryById(id);
                     Log.d(TAG, "run: 历史记录：\n" + cartoonHistory);
                     cartoonItemListViewAdapter.setCartoonHistory(cartoonHistory);
+                    countDownLatch.countDown();
                     runOnUiThread(new Runnable()
                     {
                         @Override
@@ -332,6 +339,15 @@ public class CartoonItemActivity extends AppCompatActivity
             {
                 CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(CartoonItemActivity.this);
                 CartoonHistory cartoonHistory = cartoonHistoryDao.queryById(id);
+                try
+                {
+                    countDownLatch.await();
+                }
+                catch (InterruptedException e)
+                {
+                    //不会被打断
+                    Log.e(TAG, "run: ", e);
+                }
                 runOnUiThread(new Runnable()
                 {
                     @Override
