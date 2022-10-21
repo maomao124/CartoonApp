@@ -66,6 +66,7 @@ public class searchActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
+                closeInput(searchActivity.this, editText);
                 search(editText, listView);
             }
         });

@@ -10,8 +10,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.Collections;
@@ -33,6 +35,7 @@ public class ContentActivity extends AppCompatActivity
      */
     private static final String TAG = "ContentActivity";
     private WebView webView;
+    private LinearLayout linearLayout;
 
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -63,6 +66,8 @@ public class ContentActivity extends AppCompatActivity
 
         webView = findViewById(R.id.WebView);
 
+        linearLayout = findViewById(R.id.loading);
+
         webView.setWebViewClient(new WebViewClient()
         {
             @Override
@@ -85,17 +90,7 @@ public class ContentActivity extends AppCompatActivity
                     toastShow("观看完毕，返回");
                     finish();
                 }
-            }
-
-            @Override
-            public void onLoadResource(WebView view, String url)
-            {
-                //http://m.qiman57.com/21429/1413472.html
-                //Log.d(TAG, "onLoadResource: 网页url：" + url);
-                Pattern pattern = Pattern.compile(URLConstant.baseUrl + "\\d+/\\d+.html");
-                Matcher matcher = pattern.matcher(url);
-                boolean result = matcher.matches();
-                if (result)
+                else
                 {
                     Log.d(TAG, "onLoadResource: 网页url：" + url);
                     String substring = url.substring(URLConstant.baseUrl.length(), url.length() - 5);
@@ -155,6 +150,20 @@ public class ContentActivity extends AppCompatActivity
                         });
                     }
                 }
+            }
+
+            @Override
+            public void onLoadResource(WebView view, String url)
+            {
+                //http://m.qiman57.com/21429/1413472.html
+                //Log.d(TAG, "onLoadResource: 网页url：" + url);
+//                Pattern pattern = Pattern.compile(URLConstant.baseUrl + "\\d+/\\d+.html");
+//                Matcher matcher = pattern.matcher(url);
+//                boolean result = matcher.matches();
+//                if (result)
+//                {
+//
+//                }
                 super.onLoadResource(view, url);
             }
 
@@ -177,6 +186,7 @@ public class ContentActivity extends AppCompatActivity
                     view.loadUrl("javascript:" + OtherConstant.js);
                     view.loadUrl("javascript:hideOther();");
                 }
+                linearLayout.setVisibility(View.GONE);
             }
         });
 
