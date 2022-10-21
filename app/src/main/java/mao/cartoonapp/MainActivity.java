@@ -37,6 +37,7 @@ import mao.cartoonapp.constant.OtherConstant;
 import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.dao.CartoonFavoritesDao;
 import mao.cartoonapp.dao.CartoonHistoryDao;
+import mao.cartoonapp.dao.CartoonUpdateDao;
 
 
 public class MainActivity extends AppCompatActivity
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity
     private long exitTime = 0;
     private CartoonFavoritesDao cartoonFavoritesDao;
     private CartoonHistoryDao cartoonHistoryDao;
+    private CartoonUpdateDao cartoonUpdateDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -84,12 +86,17 @@ public class MainActivity extends AppCompatActivity
         cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
         cartoonHistoryDao.openReadConnection();
         cartoonHistoryDao.openWriteConnection();
+        cartoonUpdateDao = CartoonUpdateDao.getInstance(this);
+        cartoonUpdateDao.openReadConnection();
+        cartoonUpdateDao.openWriteConnection();
 
         networkReceiver = new NetworkReceiver();
         IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(networkReceiver, intentFilter);
 
         MainApplication.getInstance().runUpdateThread(this);
+
+        MainApplication.getInstance().startCartoonUpdate(this);
     }
 
     @Override
@@ -142,7 +149,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 break;
             case 7:
-               new AlertDialog.Builder(this)
+                new AlertDialog.Builder(this)
                         .setTitle("缓存删除提示")
                         .setMessage("删除缓存后，下次启动时需要重新加载图片，这将会产生流量消耗！\n" +
                                 "是否继续？")
@@ -193,6 +200,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "onDestroy: 软件即将关闭！！！");
         cartoonFavoritesDao.closeConnection();
         cartoonHistoryDao.closeConnection();
+        cartoonUpdateDao.closeConnection();
         unregisterReceiver(networkReceiver);
 
         Thread updateThread = MainApplication.getInstance().getUpdateThread();

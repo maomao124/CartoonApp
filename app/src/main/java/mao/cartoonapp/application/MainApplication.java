@@ -3,6 +3,10 @@ package mao.cartoonapp.application;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,11 +15,14 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +42,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import mao.cartoonapp.CartoonItemActivity;
+import mao.cartoonapp.FavoritesActivity;
 import mao.cartoonapp.R;
 import mao.cartoonapp.constant.URLConstant;
+import mao.cartoonapp.dao.CartoonFavoritesDao;
+import mao.cartoonapp.dao.CartoonUpdateDao;
 import mao.cartoonapp.entity.Cartoon;
+import mao.cartoonapp.entity.CartoonItem;
+import mao.cartoonapp.entity.CartoonUpdate;
 import mao.cartoonapp.entity.ImageLoadResult;
 import mao.cartoonapp.entity.VersionInfo;
 import mao.cartoonapp.net.HTTP;
@@ -153,6 +167,8 @@ public class MainApplication extends Application
         http.setConnectTimeout(16000);
         http.setReadTimeout(10000);
         http.setThreadPool(threadPool);
+
+        createNotificationChannel("1", "漫画更新通知", NotificationManager.IMPORTANCE_DEFAULT);
 
         cartoonService = new CartoonServiceImpl(http);
 
@@ -482,6 +498,107 @@ public class MainApplication extends Application
     }
 
 
+    public void startCartoonUpdate(Activity activity)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (isToday())
+                {
+                    Log.d(TAG, "run: 今天已经检查过漫画更新");
+                    return;
+                }
+                Log.d(TAG, "run: 今天还没有开始更新，即将检查漫画更新");
+                cartoonUpdate(activity);
+                saveToday();
+            }
+        }).start();
+    }
+
+    private void cartoonUpdate(Activity activity)
+    {
+        CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
+        List<Cartoon> cartoonList = cartoonFavoritesDao.queryAll();
+        if (cartoonList.size() == 0)
+        {
+            return;
+        }
+
+        List<Cartoon> updateList = new ArrayList<>();
+
+        for (Cartoon cartoon : cartoonList)
+        {
+            List<CartoonItem> cartoonItem = cartoonService.getCartoonItem(Integer.parseInt(cartoon.getId()));
+            if (cartoonItem == null || cartoonItem.size() == 0)
+            {
+                continue;
+            }
+            CartoonUpdateDao cartoonUpdateDao = CartoonUpdateDao.getInstance(activity);
+            CartoonUpdate cartoonUpdate = cartoonUpdateDao.queryById(cartoon.getId());
+            if (cartoonUpdate == null)
+            {
+                Log.d(TAG, "cartoonUpdate: cartoonUpdate为空，发送更新通知");
+                activity.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Intent intent = new Intent(activity, CartoonItemActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", cartoon.getId());
+                        bundle.putString("name", cartoon.getName());
+                        bundle.putString("author", cartoon.getAuthor());
+                        bundle.putString("imgUrl", cartoon.getImgUrl());
+                        intent.putExtras(bundle);
+                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
+                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
+                                CartoonItemActivity.class, intent, R.mipmap.ic_launcher_round, loadImage(cartoon));
+                    }
+                });
+                cartoonUpdateDao.insert(new CartoonUpdate().setId(cartoon.getId()).setItemCount(cartoonItem.size()));
+                //不更新标记
+                continue;
+            }
+            if (cartoonUpdate.getItemCount() < cartoonItem.size())
+            {
+                Log.d(TAG, "cartoonUpdate: 漫画：" + cartoon.getName() + "已更新，发送更新通知");
+                activity.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Intent intent = new Intent(activity, CartoonItemActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", cartoon.getId());
+                        bundle.putString("name", cartoon.getName());
+                        bundle.putString("author", cartoon.getAuthor());
+                        bundle.putString("imgUrl", cartoon.getImgUrl());
+                        intent.putExtras(bundle);
+                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
+                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
+                                        + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
+                                        "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
+                                CartoonItemActivity.class, intent, R.mipmap.ic_launcher_round, loadImage(cartoon));
+                    }
+                });
+                cartoonUpdateDao.update(cartoonUpdate.setItemCount(cartoonItem.size()));
+                //更新标记
+                updateList.add(cartoon.setRemarks("漫画已更新：" + cartoonItem.get(0).getName()));
+            }
+            else
+            {
+                Log.d(TAG, "cartoonUpdate: 漫画：" + cartoon.getName() + "没有更新");
+            }
+        }
+        for (Cartoon cartoon : updateList)
+        {
+            cartoonFavoritesDao.update(cartoon);
+        }
+    }
+
+
     private void saveToday()
     {
         Calendar calendar = Calendar.getInstance();
@@ -497,7 +614,6 @@ public class MainApplication extends Application
 
         editor.apply();
     }
-
 
 
     private boolean isToday()
@@ -541,5 +657,146 @@ public class MainApplication extends Application
     private void toastShow(Activity activity, String message)
     {
         Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+    }
+
+
+    /**
+     * 创建通知渠道，通知的重要程度默认为NotificationManager.IMPORTANCE_HIGH
+     *
+     * @param id   id
+     * @param name 名字
+     */
+    private void createNotificationChannel(String id, String name)
+    {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel notificationChannel = new NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
+    /**
+     * 创建通知渠道
+     *
+     * @param id    id
+     * @param name  名字
+     * @param level 通知水平,比如：NotificationManager.IMPORTANCE_HIGH
+     */
+    private void createNotificationChannel(String id, String name, int level)
+    {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel notificationChannel = new NotificationChannel(id, name, level);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
+
+    /**
+     * 发送基本通知
+     *
+     * @param channelId 通道标识
+     * @param id        id
+     * @param title     标题
+     * @param content   内容
+     */
+    private void sendBaseNotification(String channelId, int id, String title, String content)
+    {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Notification notification = new NotificationCompat.Builder(this, channelId)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setAutoCancel(true)
+                .build();
+        notificationManager.notify(id, notification);
+    }
+
+    /**
+     * 发送基本通知
+     *
+     * @param channelId 通道标识
+     * @param id        id
+     * @param title     标题
+     * @param content   内容
+     * @param cls       点击后要跳转到的Activity类
+     */
+    private void sendBaseNotification(String channelId, int id, String title, String content, Class<?> cls)
+    {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.
+                getActivity(this, 0,
+                        new Intent(this, cls), 0);
+        Notification notification = new NotificationCompat.Builder(this, channelId)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build();
+        notificationManager.notify(id, notification);
+    }
+
+
+    /**
+     * 发送通知
+     *
+     * @param channelId 通道标识
+     * @param id        id
+     * @param title     标题
+     * @param content   内容
+     * @param cls       点击后要跳转到的Activity类
+     * @param smallIcon 小图标
+     * @param largeIcon 大图标
+     */
+    private void sendNotification(String channelId, int id, String title, String content,
+                                  Class<?> cls, int smallIcon, Bitmap largeIcon)
+    {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.
+                getActivity(this, 0,
+                        new Intent(this, cls), 0);
+        Notification notification = new NotificationCompat.Builder(this, channelId)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(smallIcon)
+                .setLargeIcon(largeIcon)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build();
+        notificationManager.notify(id, notification);
+    }
+
+
+    /**
+     * 发送通知
+     *
+     * @param channelId 通道标识
+     * @param id        id
+     * @param title     标题
+     * @param content   内容
+     * @param cls       cls
+     * @param intent    意图
+     * @param smallIcon 小图标
+     * @param largeIcon 大图标
+     */
+    private void sendNotification(String channelId, int id, String title, String content,
+                                  Class<?> cls, Intent intent, int smallIcon, Bitmap largeIcon)
+    {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.
+                getActivity(this, 0,
+                        intent, 0);
+        Notification notification = new NotificationCompat.Builder(this, channelId)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(smallIcon)
+                .setLargeIcon(largeIcon)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build();
+        notificationManager.notify(id, notification);
     }
 }
