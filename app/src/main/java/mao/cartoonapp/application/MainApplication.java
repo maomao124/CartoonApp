@@ -143,7 +143,7 @@ public class MainApplication extends Application
         super.onCreate();
         Log.d(TAG, "onCreate: ");
         mainApplication = this;
-        threadPool = new ThreadPoolExecutor(2, 7,
+        threadPool = new ThreadPoolExecutor(2, 9,
                 100L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>());
         http = new SimpleRestfulHTTPImpl();

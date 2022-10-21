@@ -198,13 +198,17 @@ public class CartoonItemActivity extends AppCompatActivity
     public void onConfigurationChanged(@NonNull Configuration newConfig)
     {
         super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
         {
+            Log.d(TAG, "onConfigurationChanged: 横屏");
+            toastShow("切换为横屏");
             //当切换为横屏时，显示横屏的布局
             setContentView(R.layout.activity_cartoon_item_horizontal_screen);
         }
-        else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
+        else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
         {
+            Log.d(TAG, "onConfigurationChanged: 竖屏");
+            toastShow("切换为竖屏");
             //当切换为竖屏时，显示竖屏的布局（默认竖屏的布局）
             setContentView(R.layout.activity_cartoon_item);
         }
