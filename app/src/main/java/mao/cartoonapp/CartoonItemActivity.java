@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -191,6 +192,24 @@ public class CartoonItemActivity extends AppCompatActivity
         });
 
     }
+
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        {
+            //当切换为横屏时，显示横屏的布局
+            setContentView(R.layout.activity_cartoon_item_horizontal_screen);
+        }
+        else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            //当切换为竖屏时，显示竖屏的布局（默认竖屏的布局）
+            setContentView(R.layout.activity_cartoon_item);
+        }
+    }
+
 
     /**
      * 处理程序添加收藏夹按钮
