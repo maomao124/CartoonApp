@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import mao.cartoonapp.R;
 import mao.cartoonapp.constant.URLConstant;
@@ -139,7 +142,9 @@ public class MainApplication extends Application
         super.onCreate();
         Log.d(TAG, "onCreate: ");
         mainApplication = this;
-        threadPool = Executors.newFixedThreadPool(6);
+        threadPool = new ThreadPoolExecutor(2, 7,
+                100L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>());
         http = new SimpleRestfulHTTPImpl();
         http.setConnectTimeout(16000);
         http.setReadTimeout(10000);

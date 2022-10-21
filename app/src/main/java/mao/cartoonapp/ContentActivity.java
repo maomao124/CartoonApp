@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import mao.cartoonapp.application.MainApplication;
+import mao.cartoonapp.constant.OtherConstant;
 import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.dao.CartoonHistoryDao;
 import mao.cartoonapp.entity.CartoonHistory;
@@ -33,35 +34,6 @@ public class ContentActivity extends AppCompatActivity
     private static final String TAG = "ContentActivity";
     private WebView webView;
 
-
-    /**
-     * js代码，目的是屏蔽一些广告和一些额外的元素
-     */
-    private final String js = "function getClass(parent,sClass)\n" +
-            "{\n" +
-            "\tvar aEle=parent.getElementsByTagName('div');\n" +
-            "\tvar aResult=[];\n" +
-            "\tvar i=0;\n" +
-            "\tfor(i<0;i<aEle.length;i++)\n" +
-            "\t{\n" +
-            "\t\tif(aEle[i].className==sClass)\n" +
-            "\t\t{\n" +
-            "\t\t\taResult.push(aEle[i]);\n" +
-            "\t\t}\n" +
-            "\t};\n" +
-            "\treturn aResult;\n" +
-            "}\n" +
-            "\n" +
-            "function hideOther() \n" +
-            "{\n" +
-            "\tgetClass(document,'guide-download')[0].style.display='none';\n" +
-            "\tgetClass(document,'xxtop')[0].style.display='none';\n" +
-            "\tgetClass(document,'list3_1 similar clearfix mt10')[0].style.display='none';\n" +
-            "\tgetClass(document,'read-end')[0].style.display='none';\n" +
-            "\tgetClass(document,'comment-box hide')[0].style.display='none';\n" +
-            "\tgetClass(document,'comment-input-box')[0].style.display='none';\n" +
-            "\tdocument.getElementById('adhtml').style.display='none';\n" +
-            "}";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -202,7 +174,7 @@ public class ContentActivity extends AppCompatActivity
                 boolean result = matcher.matches();
                 if (result)
                 {
-                    view.loadUrl("javascript:" + js);
+                    view.loadUrl("javascript:" + OtherConstant.js);
                     view.loadUrl("javascript:hideOther();");
                 }
             }
