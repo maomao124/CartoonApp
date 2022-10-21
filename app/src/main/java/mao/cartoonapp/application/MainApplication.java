@@ -39,12 +39,14 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import mao.cartoonapp.CartoonItemActivity;
 import mao.cartoonapp.FavoritesActivity;
 import mao.cartoonapp.R;
+import mao.cartoonapp.constant.OtherConstant;
 import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.dao.CartoonFavoritesDao;
 import mao.cartoonapp.dao.CartoonUpdateDao;
@@ -160,15 +162,16 @@ public class MainApplication extends Application
         super.onCreate();
         Log.d(TAG, "onCreate: ");
         mainApplication = this;
-        threadPool = new ThreadPoolExecutor(2, 9,
+        threadPool = new ThreadPoolExecutor(2, 198,
                 100L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>());
+                new SynchronousQueue<Runnable>());
         http = new SimpleRestfulHTTPImpl();
         http.setConnectTimeout(16000);
         http.setReadTimeout(10000);
         http.setThreadPool(threadPool);
 
         createNotificationChannel("1", "漫画更新通知", NotificationManager.IMPORTANCE_HIGH);
+        createNotificationChannel("2", "普通通知", NotificationManager.IMPORTANCE_HIGH);
 
         cartoonService = new CartoonServiceImpl(http);
 
@@ -505,7 +508,7 @@ public class MainApplication extends Application
             @Override
             public void run()
             {
-                if (isToday())
+                if (isToday(activity))
                 {
                     Log.d(TAG, "run: 今天已经检查过漫画更新");
                     return;
@@ -593,7 +596,7 @@ public class MainApplication extends Application
                                 "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
-                                CartoonItemActivity.class, pendingIntent, R.mipmap.ic_launcher_round, loadImage(cartoon));
+                                CartoonItemActivity.class, pendingIntent, R.drawable.run, loadImage(cartoon));
                     }
                 });
                 cartoonUpdateDao.update(cartoonUpdate.setItemCount(cartoonItem.size()));
@@ -629,7 +632,7 @@ public class MainApplication extends Application
     }
 
 
-    private boolean isToday()
+    private boolean isToday(Activity activity)
     {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -648,6 +651,15 @@ public class MainApplication extends Application
         if (year1 == -1)
         {
             Log.d(TAG, "isToday: 未写入过，先保存");
+            activity.runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    sendBaseNotification("2", 1, "您好",
+                            "欢迎使用！");
+                }
+            });
             saveToday();
             return false;
         }
