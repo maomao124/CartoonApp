@@ -92,6 +92,7 @@ public class ContentActivity extends AppCompatActivity
                 }
                 else
                 {
+                    linearLayout.setVisibility(View.VISIBLE);
                     Log.d(TAG, "onLoadResource: 网页url：" + url);
                     String substring = url.substring(URLConstant.baseUrl.length(), url.length() - 5);
                     //System.out.println(substring);
@@ -186,7 +187,29 @@ public class ContentActivity extends AppCompatActivity
                     view.loadUrl("javascript:" + OtherConstant.js);
                     view.loadUrl("javascript:hideOther();");
                 }
-                linearLayout.setVisibility(View.GONE);
+                MainApplication.getInstance().getThreadPool().submit(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Thread.sleep(150);
+                        }
+                        catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                linearLayout.setVisibility(View.GONE);
+                            }
+                        });
+                    }
+                });
             }
         });
 

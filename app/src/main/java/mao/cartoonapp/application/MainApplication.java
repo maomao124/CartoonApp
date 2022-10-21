@@ -508,14 +508,26 @@ public class MainApplication extends Application
             @Override
             public void run()
             {
-                if (isToday(activity))
+                try
                 {
-                    Log.d(TAG, "run: 今天已经检查过漫画更新");
-                    return;
+                    if (isToday(activity))
+                    {
+                        Log.d(TAG, "run: 今天已经检查过漫画更新");
+                        return;
+                    }
+                    Log.d(TAG, "run: 今天还没有开始更新，即将检查漫画更新");
+                    cartoonUpdate(activity);
+                    saveToday();
                 }
-                Log.d(TAG, "run: 今天还没有开始更新，即将检查漫画更新");
-                cartoonUpdate(activity);
-                saveToday();
+                catch (Exception e)
+                {
+                    new AlertDialog.Builder(activity)
+                            .setTitle("错误")
+                            .setMessage("异常内容：\n" + e)
+                            .setPositiveButton("我知道了", null)
+                            .create()
+                            .show();
+                }
             }
         }).start();
     }
