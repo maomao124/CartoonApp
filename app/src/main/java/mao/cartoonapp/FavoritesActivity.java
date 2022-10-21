@@ -18,6 +18,7 @@ import java.util.List;
 import mao.cartoonapp.adapter.CartoonListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.dao.CartoonFavoritesDao;
+import mao.cartoonapp.dao.CartoonUpdateDao;
 import mao.cartoonapp.entity.Cartoon;
 
 public class FavoritesActivity extends AppCompatActivity
@@ -52,7 +53,13 @@ public class FavoritesActivity extends AppCompatActivity
                         cartoon.setBitmap(bitmap);
                         //因为remarks字段更新比较频繁，应该在这里的时候更新一下请求后端，并更新sqlite数据库
                         //但是这里没有请求单个漫画信息的后端接口，没办法，所以这里将remarks字段清空
-                        cartoon.setRemarks("");
+                        //cartoon.setRemarks("");
+
+                        /*
+                        if (!cartoon.getRemarks().contains("漫画已更新："))
+                        {
+                            cartoon.setRemarks("");
+                        }*/
                     }
                     if (cartoonList.size() == 0)
                     {
@@ -107,6 +114,13 @@ public class FavoritesActivity extends AppCompatActivity
                 bundle.putString("author", author);
                 bundle.putString("imgUrl", imgUrl);
                 intent.putExtras(bundle);
+
+                CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(FavoritesActivity.this);
+                if (cartoon.getRemarks().contains("漫画已更新："))
+                {
+                    cartoonFavoritesDao.update(cartoon.setRemarks(cartoon.getRemarks().substring(6)));
+                    cartoonListViewAdapter.notifyDataSetChanged();
+                }
                 startActivity(intent);
             }
         });
@@ -131,6 +145,9 @@ public class FavoritesActivity extends AppCompatActivity
                                     toastShow("删除成功");
                                     cartoonList.remove(cartoon);
                                     cartoonListViewAdapter.notifyDataSetChanged();
+
+                                    CartoonUpdateDao cartoonUpdateDao = CartoonUpdateDao.getInstance(FavoritesActivity.this);
+                                    cartoonUpdateDao.delete(cartoon.getId());
                                 }
                                 else
                                 {

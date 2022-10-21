@@ -168,7 +168,7 @@ public class MainApplication extends Application
         http.setReadTimeout(10000);
         http.setThreadPool(threadPool);
 
-        createNotificationChannel("1", "漫画更新通知", NotificationManager.IMPORTANCE_DEFAULT);
+        createNotificationChannel("1", "漫画更新通知", NotificationManager.IMPORTANCE_HIGH);
 
         cartoonService = new CartoonServiceImpl(http);
 
@@ -517,6 +517,11 @@ public class MainApplication extends Application
         }).start();
     }
 
+    /**
+     * 漫画更新
+     *
+     * @param activity 活动
+     */
     private void cartoonUpdate(Activity activity)
     {
         CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
@@ -539,26 +544,31 @@ public class MainApplication extends Application
             CartoonUpdate cartoonUpdate = cartoonUpdateDao.queryById(cartoon.getId());
             if (cartoonUpdate == null)
             {
-                Log.d(TAG, "cartoonUpdate: cartoonUpdate为空，发送更新通知");
-                activity.runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        Intent intent = new Intent(activity, CartoonItemActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", cartoon.getId());
-                        bundle.putString("name", cartoon.getName());
-                        bundle.putString("author", cartoon.getAuthor());
-                        bundle.putString("imgUrl", cartoon.getImgUrl());
-                        intent.putExtras(bundle);
-                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
-                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
-                                CartoonItemActivity.class, intent, R.mipmap.ic_launcher_round, loadImage(cartoon));
-                    }
-                });
+                Log.d(TAG, "cartoonUpdate: cartoonUpdate为空，发送更新通知：" + cartoon.getName());
+                //这里不应该发送更新通知
+//                activity.runOnUiThread(new Runnable()
+//                {
+//                    @Override
+//                    public void run()
+//                    {
+//                        Intent intent = new Intent(activity, CartoonItemActivity.class);
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", cartoon.getId());
+//                        bundle.putString("name", cartoon.getName());
+//                        bundle.putString("author", cartoon.getAuthor());
+//                        bundle.putString("imgUrl", cartoon.getImgUrl());
+//                        intent.putExtras(bundle);
+//                        PendingIntent pendingIntent = PendingIntent.
+//                                getActivity(activity, Integer.parseInt(cartoon.getId()),
+//                                        intent, 0);
+//                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
+//                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
+//                                CartoonItemActivity.class, pendingIntent, R.mipmap.ic_launcher_round, loadImage(cartoon));
+//                    }
+//                });
                 cartoonUpdateDao.insert(new CartoonUpdate().setId(cartoon.getId()).setItemCount(cartoonItem.size()));
-                //不更新标记
+                //更新标记
+                updateList.add(cartoon.setRemarks("漫画已更新：" + cartoonItem.get(0).getName()));
                 continue;
             }
             if (cartoonUpdate.getItemCount() < cartoonItem.size())
@@ -576,11 +586,14 @@ public class MainApplication extends Application
                         bundle.putString("author", cartoon.getAuthor());
                         bundle.putString("imgUrl", cartoon.getImgUrl());
                         intent.putExtras(bundle);
+                        PendingIntent pendingIntent = PendingIntent.
+                                getActivity(activity, Integer.parseInt(cartoon.getId()),
+                                        intent, 0);
                         sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
                                 "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
-                                CartoonItemActivity.class, intent, R.mipmap.ic_launcher_round, loadImage(cartoon));
+                                CartoonItemActivity.class, pendingIntent, R.mipmap.ic_launcher_round, loadImage(cartoon));
                     }
                 });
                 cartoonUpdateDao.update(cartoonUpdate.setItemCount(cartoonItem.size()));
@@ -609,7 +622,7 @@ public class MainApplication extends Application
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt("year", year);
-        editor.putInt("mouth", month);
+        editor.putInt("month", month);
         editor.putInt("day", day);
 
         editor.apply();
@@ -628,23 +641,32 @@ public class MainApplication extends Application
         int month1 = sharedPreferences.getInt("month", -1);
         int day1 = sharedPreferences.getInt("day", -1);
 
+        Log.d(TAG, "isToday: 当前：" + year + "/" + month + "/" + day);
+        Log.d(TAG, "isToday: 文件：" + year1 + "/" + month1 + "/" + day1);
+
+
         if (year1 == -1)
         {
+            Log.d(TAG, "isToday: 未写入过，先保存");
             saveToday();
             return false;
         }
         if (year != year1)
         {
+            Log.d(TAG, "isToday: 不是当前天");
             return false;
         }
         if (month != month1)
         {
+            Log.d(TAG, "isToday: 不是当前天");
             return false;
         }
         if (day != day1)
         {
+            Log.d(TAG, "isToday: 不是当前天");
             return false;
         }
+        Log.d(TAG, "isToday: 当前天");
         return true;
     }
 
@@ -773,22 +795,19 @@ public class MainApplication extends Application
     /**
      * 发送通知
      *
-     * @param channelId 通道标识
-     * @param id        id
-     * @param title     标题
-     * @param content   内容
-     * @param cls       cls
-     * @param intent    意图
-     * @param smallIcon 小图标
-     * @param largeIcon 大图标
+     * @param channelId     通道标识
+     * @param id            id
+     * @param title         标题
+     * @param content       内容
+     * @param cls           cls
+     * @param pendingIntent 悬而未决意图
+     * @param smallIcon     小图标
+     * @param largeIcon     大图标
      */
     private void sendNotification(String channelId, int id, String title, String content,
-                                  Class<?> cls, Intent intent, int smallIcon, Bitmap largeIcon)
+                                  Class<?> cls, PendingIntent pendingIntent, int smallIcon, Bitmap largeIcon)
     {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.
-                getActivity(this, 0,
-                        intent, 0);
         Notification notification = new NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
                 .setContentText(content)
