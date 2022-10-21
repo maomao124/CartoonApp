@@ -3,8 +3,10 @@ package mao.cartoonapp.application;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -474,6 +477,57 @@ public class MainApplication extends Application
             {
                 deleteDirFile(file); // 递规的方式删除文件夹
             }
+        }
+        return true;
+    }
+
+
+    private void saveToday()
+    {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        SharedPreferences sharedPreferences = getSharedPreferences("date", Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("year", year);
+        editor.putInt("mouth", month);
+        editor.putInt("day", day);
+
+        editor.apply();
+    }
+
+
+
+    private boolean isToday()
+    {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        SharedPreferences sharedPreferences = getSharedPreferences("date", Context.MODE_PRIVATE);
+
+        int year1 = sharedPreferences.getInt("year", -1);
+        int month1 = sharedPreferences.getInt("month", -1);
+        int day1 = sharedPreferences.getInt("day", -1);
+
+        if (year1 == -1)
+        {
+            saveToday();
+            return false;
+        }
+        if (year != year1)
+        {
+            return false;
+        }
+        if (month != month1)
+        {
+            return false;
+        }
+        if (day != day1)
+        {
+            return false;
         }
         return true;
     }
