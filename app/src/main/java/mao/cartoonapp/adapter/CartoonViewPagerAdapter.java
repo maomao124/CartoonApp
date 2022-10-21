@@ -46,7 +46,7 @@ import mao.cartoonapp.service.CartoonService;
 public class CartoonViewPagerAdapter extends PagerAdapter
 {
 
-    private Activity activity;
+    private final Activity activity;
 
     /**
      * 标签

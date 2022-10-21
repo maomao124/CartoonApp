@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -310,7 +311,7 @@ public class MainApplication extends Application
      */
     public Bitmap loadImage(Cartoon cartoon)
     {
-        String imgPath = getExternalCacheDir().toString() + "/" + cartoon.getId() + ".jpg";
+        String imgPath = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString() + "/" + cartoon.getId() + ".jpg";
         Log.d(TAG, "loadImage: imgPath" + imgPath);
         //从本地加载
         Bitmap bitmap = openImage(imgPath);
@@ -443,6 +444,40 @@ public class MainApplication extends Application
             return false;
         }
     }
+
+
+    /**
+     * 删除一个目录里面的所有文件
+     *
+     * @param dir dir
+     * @return boolean
+     */
+    @SuppressWarnings("all")
+    public boolean deleteDirFile(File dir)
+    {
+        if (dir == null || !dir.exists() || !dir.isDirectory())
+        {
+            return false;
+        }
+        File[] listFiles = dir.listFiles();
+        if (listFiles == null)
+        {
+            return false;
+        }
+        for (File file : listFiles)
+        {
+            if (file.isFile())
+            {
+                file.delete(); // 删除所有文件
+            }
+            else if (file.isDirectory())
+            {
+                deleteDirFile(file); // 递规的方式删除文件夹
+            }
+        }
+        return true;
+    }
+
 
     /**
      * 显示消息

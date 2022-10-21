@@ -11,6 +11,7 @@ import android.app.AlertDialog;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
+import android.os.Environment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -25,6 +27,8 @@ import android.view.MenuItem;
 
 import android.widget.Toast;
 
+
+import java.io.File;
 
 import mao.cartoonapp.adapter.CartoonViewPagerAdapter;
 
@@ -97,6 +101,7 @@ public class MainActivity extends AppCompatActivity
         menu.add(1, 4, 4, "软件说明");
         menu.add(1, 5, 5, "检查更新");
         menu.add(1, 6, 6, "给项目点赞");
+        menu.add(1, 7, 7, "清除缓存");
         menu.add(1, 999, 999, "退出");
 
         return true;
@@ -106,6 +111,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
         int id = item.getItemId();
+        String dir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).toString();
         switch (id)
         {
             case 1:
@@ -135,6 +141,45 @@ public class MainActivity extends AppCompatActivity
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 break;
+            case 7:
+               new AlertDialog.Builder(this)
+                        .setTitle("缓存删除提示")
+                        .setMessage("删除缓存后，下次启动时需要重新加载图片，这将会产生流量消耗！\n" +
+                                "是否继续？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                MainApplication.getInstance().getThreadPool().submit(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        boolean b = MainApplication.getInstance().deleteDirFile(new File(dir));
+                                        runOnUiThread(new Runnable()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                if (b)
+                                                {
+                                                    toastShow("缓存清除成功");
+                                                }
+                                                else
+                                                {
+                                                    toastShow("缓存清除失败");
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        })
+                        .setNeutralButton("取消", null)
+                        .create()
+                        .show();
+                break;
             case 999:
                 finish();
         }
@@ -158,7 +203,7 @@ public class MainActivity extends AppCompatActivity
             {
                 updateThread.stop();
             }
-            catch (Exception e)
+            catch (Exception ignored)
             {
 
             }
