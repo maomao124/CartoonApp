@@ -42,6 +42,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import mao.cartoonapp.CartoonItemActivity;
 import mao.cartoonapp.FavoritesActivity;
@@ -124,6 +125,11 @@ public class MainApplication extends Application
      * 获取更新失败计数
      */
     private int count;
+
+    /**
+     * 漫画是否正在更新
+     */
+    private volatile boolean isCartoonUpdate;
 
 
     public ExecutorService getThreadPool()
@@ -539,6 +545,7 @@ public class MainApplication extends Application
      */
     private void cartoonUpdate(Activity activity)
     {
+        Thread currentThread = Thread.currentThread();
         CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
         List<Cartoon> cartoonList = cartoonFavoritesDao.queryAll();
         if (cartoonList.size() == 0)
@@ -605,14 +612,16 @@ public class MainApplication extends Application
                                 getActivity(activity, Integer.parseInt(cartoon.getId()),
                                         intent, 0);
                         sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
-                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
+                                "漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
                                 CartoonItemActivity.class, pendingIntent, R.drawable.run, loadImage(cartoon));
+                        LockSupport.unpark(currentThread);
                     }
                 });
-                cartoonUpdateDao.update(cartoonUpdate.setItemCount(cartoonItem.size()));
+                LockSupport.park();
                 //更新标记
+                cartoonUpdateDao.update(cartoonUpdate.setItemCount(cartoonItem.size()));
                 updateList.add(cartoon.setRemarks("漫画已更新：" + cartoonItem.get(0).getName()));
             }
             else
@@ -624,6 +633,132 @@ public class MainApplication extends Application
         {
             cartoonFavoritesDao.update(cartoon);
         }
+    }
+
+    /**
+     * 漫画更新
+     *
+     * @param activity 活动
+     */
+    public void cartoonUpdateByButton(Activity activity)
+    {
+        if (isCartoonUpdate)
+        {
+            activity.runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    toastShow(activity, "漫画更新线程已经正在运行");
+                }
+            });
+        }
+        activity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                toastShow(activity, "后台检查更新中，如果漫画有更新，稍后会发送通知");
+            }
+        });
+        isCartoonUpdate = true;
+        Thread currentThread = Thread.currentThread();
+        CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
+        List<Cartoon> cartoonList = cartoonFavoritesDao.queryAll();
+        if (cartoonList.size() == 0)
+        {
+            return;
+        }
+
+        List<Cartoon> updateList = new ArrayList<>();
+
+        for (Cartoon cartoon : cartoonList)
+        {
+            List<CartoonItem> cartoonItem = cartoonService.getCartoonItem(Integer.parseInt(cartoon.getId()));
+            if (cartoonItem == null || cartoonItem.size() == 0)
+            {
+                continue;
+            }
+            CartoonUpdateDao cartoonUpdateDao = CartoonUpdateDao.getInstance(activity);
+            CartoonUpdate cartoonUpdate = cartoonUpdateDao.queryById(cartoon.getId());
+            if (cartoonUpdate == null)
+            {
+                Log.d(TAG, "cartoonUpdate: cartoonUpdate为空，发送更新通知：" + cartoon.getName());
+                //这里不应该发送更新通知
+//                activity.runOnUiThread(new Runnable()
+//                {
+//                    @Override
+//                    public void run()
+//                    {
+//                        Intent intent = new Intent(activity, CartoonItemActivity.class);
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", cartoon.getId());
+//                        bundle.putString("name", cartoon.getName());
+//                        bundle.putString("author", cartoon.getAuthor());
+//                        bundle.putString("imgUrl", cartoon.getImgUrl());
+//                        intent.putExtras(bundle);
+//                        PendingIntent pendingIntent = PendingIntent.
+//                                getActivity(activity, Integer.parseInt(cartoon.getId()),
+//                                        intent, 0);
+//                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
+//                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
+//                                CartoonItemActivity.class, pendingIntent, R.mipmap.ic_launcher_round, loadImage(cartoon));
+//                    }
+//                });
+                cartoonUpdateDao.insert(new CartoonUpdate().setId(cartoon.getId()).setItemCount(cartoonItem.size()));
+                //更新标记
+                updateList.add(cartoon.setRemarks("漫画已更新：" + cartoonItem.get(0).getName()));
+                continue;
+            }
+            if (cartoonUpdate.getItemCount() < cartoonItem.size())
+            {
+                Log.d(TAG, "cartoonUpdate: 漫画：" + cartoon.getName() + "已更新，发送更新通知");
+                activity.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        Intent intent = new Intent(activity, CartoonItemActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", cartoon.getId());
+                        bundle.putString("name", cartoon.getName());
+                        bundle.putString("author", cartoon.getAuthor());
+                        bundle.putString("imgUrl", cartoon.getImgUrl());
+                        intent.putExtras(bundle);
+                        PendingIntent pendingIntent = PendingIntent.
+                                getActivity(activity, Integer.parseInt(cartoon.getId()),
+                                        intent, 0);
+                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
+                                "漫画\"" + cartoon.getName() + "\"已更新"
+                                        + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
+                                        "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
+                                CartoonItemActivity.class, pendingIntent, R.drawable.run, loadImage(cartoon));
+                        LockSupport.unpark(currentThread);
+                    }
+                });
+                LockSupport.park();
+                //更新标记
+                cartoonUpdateDao.update(cartoonUpdate.setItemCount(cartoonItem.size()));
+                updateList.add(cartoon.setRemarks("漫画已更新：" + cartoonItem.get(0).getName()));
+            }
+            else
+            {
+                Log.d(TAG, "cartoonUpdate: 漫画：" + cartoon.getName() + "没有更新");
+            }
+        }
+        for (Cartoon cartoon : updateList)
+        {
+            cartoonFavoritesDao.update(cartoon);
+        }
+        isCartoonUpdate = false;
+        activity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                toastShow(activity,"已完成检查漫画更新");
+            }
+        });
     }
 
 

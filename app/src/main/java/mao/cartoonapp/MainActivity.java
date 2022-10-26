@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity
         menu.add(1, 5, 5, "检查更新");
         menu.add(1, 6, 6, "给项目点赞");
         menu.add(1, 7, 7, "清除缓存");
+        menu.add(1, 8, 8, "检查漫画更新");
         menu.add(1, 999, 999, "退出");
 
         return true;
@@ -184,6 +185,32 @@ public class MainActivity extends AppCompatActivity
                             }
                         })
                         .setNeutralButton("取消", null)
+                        .create()
+                        .show();
+                break;
+            case 8:
+                new AlertDialog.Builder(this)
+                        .setTitle("漫画更新提示")
+                        .setMessage("您确定要运行检查漫画更新服务吗？\n" +
+                                "这会对后端服务器造成比较大的压力。\n" +
+                                "您每天的第一次运行此软件，软件都会自动的检查漫画更新，如果当天已经检查了漫画更新，" +
+                                "那么这一天之内大概率不会检查出有任何的漫画更新，如果非必要，请不要运行!!!")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                MainApplication.getInstance().getThreadPool().submit(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        MainApplication.getInstance().cartoonUpdateByButton(MainActivity.this);
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("取消", null)
                         .create()
                         .show();
                 break;
