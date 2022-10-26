@@ -284,6 +284,33 @@ public class ContentActivity extends AppCompatActivity
     {
         menu.add(1, 1, 1, "刷新");
         menu.add(1, 2, 2, "页面返回");
+        menu.add(1, 999, 999, "返回");
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item)
+    {
+        int id = item.getItemId();
+        if (id == 1)
+        {
+            webView.reload();
+        }
+        else if (id == 2)
+        {
+            if (webView.canGoBack())
+            {
+                webView.goBack();
+            }
+            else
+            {
+                toastShow("页面不能再回退了");
+            }
+        }
+        else if (id == 999)
+        {
+            finish();
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override

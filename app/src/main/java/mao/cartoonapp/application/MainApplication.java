@@ -804,7 +804,7 @@ public class MainApplication extends Application
                 public void run()
                 {
                     sendBaseNotification("2", 1, "您好",
-                            "欢迎使用！");
+                            "欢迎使用！\n\n" + OtherConstant.softwareDocumentation);
                 }
             });
             saveToday();
@@ -888,7 +888,7 @@ public class MainApplication extends Application
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification notification = new NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
-                .setContentText(content)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setAutoCancel(true)
                 .build();
@@ -959,7 +959,7 @@ public class MainApplication extends Application
      * @param title         标题
      * @param content       内容
      * @param cls           cls
-     * @param pendingIntent 悬而未决意图
+     * @param pendingIntent PendingIntent
      * @param smallIcon     小图标
      * @param largeIcon     大图标
      */
