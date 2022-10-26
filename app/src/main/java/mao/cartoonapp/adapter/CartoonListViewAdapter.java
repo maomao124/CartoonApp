@@ -1,6 +1,7 @@
 package mao.cartoonapp.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,10 +40,20 @@ public class CartoonListViewAdapter extends BaseAdapter
      */
     private final List<Cartoon> cartoonList;
 
+    /**
+     * remark TextView默认的颜色
+     */
+    private final int remarksDefaultColor;
+
+
     public CartoonListViewAdapter(Context context, List<Cartoon> cartoonList)
     {
         this.context = context;
         this.cartoonList = cartoonList;
+
+        View view = LayoutInflater.from(context).inflate(R.layout.item_listview_cartoon, null);
+        TextView textView = view.findViewById(R.id.remarks);
+        remarksDefaultColor = textView.getTextColors().getDefaultColor();
     }
 
     @Override
@@ -86,6 +97,14 @@ public class CartoonListViewAdapter extends BaseAdapter
         cartoonListViewHolder.name.setText(cartoon.getName());
         cartoonListViewHolder.author.setText(cartoon.getAuthor());
         cartoonListViewHolder.remarks.setText(cartoon.getRemarks());
+        if (cartoon.getRemarks().contains("漫画已更新："))
+        {
+            cartoonListViewHolder.remarks.setTextColor(Color.rgb(255, 140, 200));
+        }
+        else
+        {
+            cartoonListViewHolder.remarks.setTextColor(this.remarksDefaultColor);
+        }
         return convertView;
     }
 
