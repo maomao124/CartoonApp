@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -38,6 +39,9 @@ public class searchActivity extends AppCompatActivity
     private static final String TAG = "searchActivity";
     private List<Cartoon> cartoonList;
 
+    private long startTime = -1;
+    private LinearLayout linearLayout_loading;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -47,6 +51,7 @@ public class searchActivity extends AppCompatActivity
         EditText editText = findViewById(R.id.EditText_search);
         Button button = findViewById(R.id.Button_search);
         ListView listView = findViewById(R.id.ListView);
+        linearLayout_loading = findViewById(R.id.loading);
 
         CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
         cartoonFavoritesDao.openReadConnection();
@@ -159,6 +164,18 @@ public class searchActivity extends AppCompatActivity
             toastShow("搜索关键字必须至少两个字");
             return;
         }
+
+        long endTime = System.currentTimeMillis();
+        if (endTime - startTime < 2000)
+        {
+            toastShow("请求过于频繁");
+            return;
+        }
+        startTime = endTime;
+
+        listView.setVisibility(View.GONE);
+        linearLayout_loading.setVisibility(View.VISIBLE);
+
         MainApplication.getInstance().getThreadPool().submit(new Runnable()
         {
             @Override
@@ -177,6 +194,8 @@ public class searchActivity extends AppCompatActivity
                             public void run()
                             {
                                 toastShow("搜索结果的数量为0");
+                                listView.setVisibility(View.GONE);
+                                linearLayout_loading.setVisibility(View.GONE);
                             }
                         });
                         return;
@@ -192,6 +211,8 @@ public class searchActivity extends AppCompatActivity
                             toastShow("搜索到" + cartoonList.size() + "条结果");
                             listView.setAdapter(cartoonListViewAdapter);
                             cartoonListViewAdapter.notifyDataSetChanged();
+                            listView.setVisibility(View.VISIBLE);
+                            linearLayout_loading.setVisibility(View.GONE);
                         }
                     });
                     for (Cartoon cartoon : cartoonList)
@@ -212,6 +233,9 @@ public class searchActivity extends AppCompatActivity
                 }
                 catch (Exception e)
                 {
+                    listView.setVisibility(View.GONE);
+                    linearLayout_loading.setVisibility(View.GONE);
+
                     Log.e(TAG, "run: ", e);
                     new AlertDialog.Builder(searchActivity.this)
                             .setTitle("错误")

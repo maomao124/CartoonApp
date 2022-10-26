@@ -31,9 +31,33 @@
     </LinearLayout>
 
 
+    <LinearLayout
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="gone">
+
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="加载中,请稍后..."
+                android:layout_marginStart="5dp"
+                android:textSize="20sp"
+                android:textColor="#00ccff" />
+
+    </LinearLayout>
+
     <ListView
             android:id="@+id/ListView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
 
 </LinearLayout>
