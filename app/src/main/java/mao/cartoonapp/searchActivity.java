@@ -24,6 +24,8 @@ import java.util.List;
 import mao.cartoonapp.adapter.CartoonListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.dao.CartoonFavoritesDao;
+import mao.cartoonapp.dao.CartoonHistoryDao;
+import mao.cartoonapp.dao.CartoonUpdateDao;
 import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.service.CartoonService;
 
@@ -45,6 +47,18 @@ public class searchActivity extends AppCompatActivity
         EditText editText = findViewById(R.id.EditText_search);
         Button button = findViewById(R.id.Button_search);
         ListView listView = findViewById(R.id.ListView);
+
+        CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
+        cartoonFavoritesDao.openReadConnection();
+        cartoonFavoritesDao.openWriteConnection();
+        CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
+        cartoonHistoryDao.openReadConnection();
+        cartoonHistoryDao.openWriteConnection();
+        CartoonUpdateDao cartoonUpdateDao = CartoonUpdateDao.getInstance(this);
+        cartoonUpdateDao.openReadConnection();
+        cartoonUpdateDao.openWriteConnection();
+
+
         editText.setOnKeyListener(new View.OnKeyListener()
         {
             @Override

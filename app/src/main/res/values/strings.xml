@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">漫画App</string>
     <string name="version">v1.7</string>
+
+    <string name="shortcut1_short">收藏夹</string>
+    <string name="shortcut1_long">漫画收藏夹</string>
+
+    <string name="shortcut2_short">历史</string>
+    <string name="shortcut2_long">历史记录</string>
+
+    <string name="shortcut3_short">搜索</string>
+    <string name="shortcut3_long">漫画搜索</string>
 </resources>

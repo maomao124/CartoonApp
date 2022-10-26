@@ -27,7 +27,9 @@ import java.util.List;
 import mao.cartoonapp.adapter.CartoonListViewAdapter;
 import mao.cartoonapp.application.MainApplication;
 import mao.cartoonapp.constant.URLConstant;
+import mao.cartoonapp.dao.CartoonFavoritesDao;
 import mao.cartoonapp.dao.CartoonHistoryDao;
+import mao.cartoonapp.dao.CartoonUpdateDao;
 import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.entity.CartoonHistory;
 
@@ -54,6 +56,16 @@ public class CartoonHistoryActivity extends AppCompatActivity
 
         listView = findViewById(R.id.ListView);
         textView = findViewById(R.id.TextView);
+
+        CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
+        cartoonFavoritesDao.openReadConnection();
+        cartoonFavoritesDao.openWriteConnection();
+        CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
+        cartoonHistoryDao.openReadConnection();
+        cartoonHistoryDao.openWriteConnection();
+        CartoonUpdateDao cartoonUpdateDao = CartoonUpdateDao.getInstance(this);
+        cartoonUpdateDao.openReadConnection();
+        cartoonUpdateDao.openWriteConnection();
     }
 
     @Override
