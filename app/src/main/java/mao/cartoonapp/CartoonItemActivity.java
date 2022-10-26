@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ public class CartoonItemActivity extends AppCompatActivity
     private Button button_add_favorites;
     private Button button_start;
     private CountDownLatch countDownLatch;
+    private LinearLayout linearLayout_loading;
 
 
     @Override
@@ -64,6 +66,7 @@ public class CartoonItemActivity extends AppCompatActivity
         listView = findViewById(R.id.ListView);
         button_add_favorites = findViewById(R.id.Button_add_favorites);
         button_start = findViewById(R.id.Button_start);
+        linearLayout_loading = findViewById(R.id.loading);
 
         countDownLatch = new CountDownLatch(1);
 
@@ -139,6 +142,8 @@ public class CartoonItemActivity extends AppCompatActivity
                         {
                             cartoonItemListViewAdapter.notifyDataSetChanged();
                             listView.setAdapter(cartoonItemListViewAdapter);
+                            linearLayout_loading.setVisibility(View.GONE);
+                            listView.setVisibility(View.VISIBLE);
                         }
                     });
 

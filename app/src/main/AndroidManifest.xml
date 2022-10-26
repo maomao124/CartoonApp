@@ -19,7 +19,7 @@
         <activity
                 android:name=".CartoonHistoryActivity"
                 android:exported="false"
-                android:screenOrientation="landscape">
+                android:screenOrientation="portrait">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
@@ -27,7 +27,7 @@
         <activity
                 android:name=".searchActivity"
                 android:exported="false"
-                android:screenOrientation="landscape">
+                android:screenOrientation="portrait">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
@@ -35,7 +35,7 @@
         <activity
                 android:name=".FavoritesActivity"
                 android:exported="false"
-                android:screenOrientation="landscape">
+                android:screenOrientation="portrait">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
@@ -43,7 +43,7 @@
         <activity
                 android:name=".CartoonItemActivity"
                 android:exported="false"
-                android:screenOrientation="landscape">
+                android:screenOrientation="portrait">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
@@ -51,7 +51,7 @@
         <activity
                 android:name=".ContentActivity"
                 android:exported="false"
-                android:screenOrientation="landscape">
+                android:screenOrientation="portrait">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
@@ -59,7 +59,7 @@
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
-                android:screenOrientation="landscape">
+                android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
