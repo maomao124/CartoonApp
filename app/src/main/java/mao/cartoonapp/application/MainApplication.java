@@ -612,7 +612,7 @@ public class MainApplication extends Application
                                 getActivity(activity, Integer.parseInt(cartoon.getId()),
                                         intent, 0);
                         sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
-                                "漫画\"" + cartoon.getName() + "\"已更新"
+                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
                                 CartoonItemActivity.class, pendingIntent, R.drawable.run, loadImage(cartoon));
@@ -729,7 +729,7 @@ public class MainApplication extends Application
                                 getActivity(activity, Integer.parseInt(cartoon.getId()),
                                         intent, 0);
                         sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
-                                "漫画\"" + cartoon.getName() + "\"已更新"
+                                "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
                                 CartoonItemActivity.class, pendingIntent, R.drawable.run, loadImage(cartoon));
@@ -756,7 +756,7 @@ public class MainApplication extends Application
             @Override
             public void run()
             {
-                toastShow(activity,"已完成检查漫画更新");
+                toastShow(activity, "已完成检查漫画更新");
             }
         });
     }
@@ -969,7 +969,7 @@ public class MainApplication extends Application
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification notification = new NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
-                .setContentText(content)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                 .setSmallIcon(smallIcon)
                 .setLargeIcon(largeIcon)
                 .setAutoCancel(true)
