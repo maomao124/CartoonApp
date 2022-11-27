@@ -1,12 +1,14 @@
 package mao.cartoonapp.service;
 
 import com.alibaba.fastjson.JSON;
+
 import mao.cartoonapp.constant.URLConstant;
 import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.entity.CartoonItem;
 import mao.cartoonapp.entity.CartoonItemRequestBody;
 import mao.cartoonapp.net.HTTP;
 import mao.cartoonapp.net.RestfulHTTP;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -58,7 +60,7 @@ public class CartoonServiceImpl implements CartoonService
 
     public List<Cartoon> getCartoonListByJson(Map<String, String> requestHeader, int pageNumber, int type)
     {
-        return this.getCartoonListByJson("http://m.qiman57.com/ajaxf/?page_num=" + pageNumber + "&type=" + type,
+        return this.getCartoonListByJson(URLConstant.baseUrl + "ajaxf/?page_num=" + pageNumber + "&type=" + type,
                 requestHeader);
     }
 
