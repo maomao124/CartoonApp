@@ -17,6 +17,13 @@
             android:usesCleartextTraffic="true"
             tools:targetApi="31">
         <activity
+                android:name=".BackupAndRecoveryActivity"
+                android:exported="false">
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value="" />
+        </activity>
+        <activity
                 android:name=".CartoonHistoryActivity"
                 android:exported="false"
                 android:screenOrientation="portrait">
@@ -68,7 +75,7 @@
 
             <meta-data
                     android:name="android.app.shortcuts"
-                    android:resource="@xml/shortcuts"/>
+                    android:resource="@xml/shortcuts" />
         </activity>
     </application>
 

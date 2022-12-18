@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity
         menu.add(1, 6, 6, "给项目点赞");
         menu.add(1, 7, 7, "清除缓存");
         menu.add(1, 8, 8, "检查漫画更新");
+        menu.add(1, 9, 9, "备份与恢复");
         menu.add(1, 999, 999, "退出");
 
         return true;
@@ -213,6 +214,9 @@ public class MainActivity extends AppCompatActivity
                         .setNegativeButton("取消", null)
                         .create()
                         .show();
+                break;
+            case 9:
+                startActivity(new Intent(this, BackupAndRecoveryActivity.class));
                 break;
             case 999:
                 finish();
