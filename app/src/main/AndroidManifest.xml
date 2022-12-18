@@ -3,6 +3,8 @@
         xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
             android:name=".application.MainApplication"
@@ -11,11 +13,19 @@
             android:fullBackupContent="@xml/backup_rules"
             android:icon="@drawable/run"
             android:label="@string/app_name"
+            android:requestLegacyExternalStorage="true"
             android:roundIcon="@drawable/run"
             android:supportsRtl="true"
             android:theme="@style/Theme.CartoonApp"
             android:usesCleartextTraffic="true"
             tools:targetApi="31">
+        <activity
+                android:name=".BackupActivity"
+                android:exported="false">
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value="" />
+        </activity>
         <activity
                 android:name=".BackupAndRecoveryActivity"
                 android:exported="false">
