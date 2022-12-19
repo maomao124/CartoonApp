@@ -1,6 +1,7 @@
 package mao.cartoonapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -11,11 +12,15 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
 
 public class BackupAndRecoveryActivity extends AppCompatActivity
 {
@@ -29,10 +34,13 @@ public class BackupAndRecoveryActivity extends AppCompatActivity
      */
     private Button recoveryButton;
 
+    private int requestTotal = 0;
+
     private final String[] permissions =
             {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    //Manifest.permission.MANAGE_EXTERNAL_STORAGE
             };
 
     @Override
@@ -83,7 +91,7 @@ public class BackupAndRecoveryActivity extends AppCompatActivity
     }
 
     /**
-     * 保存
+     * 备份和恢复
      *
      * @param requestCode 请求代码 ,可以是组件的id
      */
@@ -100,6 +108,38 @@ public class BackupAndRecoveryActivity extends AppCompatActivity
         {
             backupButton.setEnabled(false);
             recoveryButton.setEnabled(false);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestTotal < 1)
+        {
+            // android 11  且 不是已经被拒绝
+            // 先判断有没有权限
+            if (!Environment.isExternalStorageManager())
+            {
+                requestTotal++;
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 1024);
+            }
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        {
+            if (!Environment.isExternalStorageManager())
+            {
+                backupButton.setEnabled(false);
+                recoveryButton.setEnabled(false);
+                toastShow("安卓12需要完全的文件访问权限，请允许");
+            }
+            else
+            {
+                if (checkPermission(BackupAndRecoveryActivity.this, permissions,
+                        requestCode % 65536))
+                {
+                    //成功获取到权限
+                    backupButton.setEnabled(true);
+                    recoveryButton.setEnabled(true);
+                }
+            }
+
         }
     }
 
@@ -123,6 +163,21 @@ public class BackupAndRecoveryActivity extends AppCompatActivity
                 backupButton.setEnabled(false);
                 recoveryButton.setEnabled(false);
                 toastShow("没有存储权限! 请在设置中允许本软件存储权限的访问");
+            }
+        }
+        if (requestCode == 1024 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        {
+            // 检查是否有权限
+            if (Environment.isExternalStorageManager())
+            {
+                // 授权成功
+            }
+            else
+            {
+                backupButton.setEnabled(false);
+                recoveryButton.setEnabled(false);
+                // 授权失败
+                toastShow("安卓12需要完全的文件访问权限，请允许");
             }
         }
     }

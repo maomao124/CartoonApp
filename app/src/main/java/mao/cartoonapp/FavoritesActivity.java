@@ -54,6 +54,10 @@ public class FavoritesActivity extends AppCompatActivity
         cartoonUpdateDao.openReadConnection();
         cartoonUpdateDao.openWriteConnection();
 
+        loading.setVisibility(View.VISIBLE);
+        textView.setVisibility(View.GONE);
+        listView.setVisibility(View.GONE);
+
         MainApplication.getInstance().getThreadPool().submit(new Runnable()
         {
             @Override
@@ -61,17 +65,21 @@ public class FavoritesActivity extends AppCompatActivity
             {
                 try
                 {
-                    Thread.sleep(1000);
-                    loading.setVisibility(View.VISIBLE);
-                    textView.setVisibility(View.GONE);
-                    listView.setVisibility(View.GONE);
                     CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(FavoritesActivity.this);
                     cartoonList = cartoonFavoritesDao.queryAll();
                     if (cartoonList.size() == 0)
                     {
-                        loading.setVisibility(View.GONE);
-                        textView.setVisibility(View.VISIBLE);
-                        listView.setVisibility(View.GONE);
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                loading.setVisibility(View.GONE);
+                                textView.setVisibility(View.VISIBLE);
+                                listView.setVisibility(View.GONE);
+                            }
+                        });
+
                         return;
                     }
                     cartoonListViewAdapter = new CartoonListViewAdapter(FavoritesActivity.this, cartoonList);
