@@ -1,9 +1,12 @@
 package mao.cartoonapp;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +17,11 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import mao.cartoonapp.dao.CartoonFavoritesDao;
@@ -23,6 +31,7 @@ import mao.cartoonapp.entity.Cartoon;
 import mao.cartoonapp.entity.CartoonHistory;
 import mao.cartoonapp.entity.CartoonUpdate;
 import mao.cartoonapp.entity.UserData;
+import mao.cartoonapp.utils.UriUtil;
 
 public class RecoveryActivity extends AppCompatActivity
 {
@@ -63,6 +72,10 @@ public class RecoveryActivity extends AppCompatActivity
      */
     private TextView textView_total;
 
+    private CartoonFavoritesDao cartoonFavoritesDao;
+    private CartoonHistoryDao cartoonHistoryDao;
+    private CartoonUpdateDao cartoonUpdateDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -76,13 +89,13 @@ public class RecoveryActivity extends AppCompatActivity
         textView_current = findViewById(R.id.textView_current);
         textView_total = findViewById(R.id.textView_total);
 
-        CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
+        cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
         cartoonFavoritesDao.openReadConnection();
         cartoonFavoritesDao.openWriteConnection();
-        CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
+        cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
         cartoonHistoryDao.openReadConnection();
         cartoonHistoryDao.openWriteConnection();
-        CartoonUpdateDao cartoonUpdateDao = CartoonUpdateDao.getInstance(this);
+        cartoonUpdateDao = CartoonUpdateDao.getInstance(this);
         cartoonUpdateDao.openReadConnection();
         cartoonUpdateDao.openWriteConnection();
 
@@ -119,10 +132,113 @@ public class RecoveryActivity extends AppCompatActivity
             }
         });
 
+        recoveryLoadFromFile.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent, 13347);
+            }
+        });
 
     }
 
-    private void recoveryData(CartoonFavoritesDao cartoonFavoritesDao, CartoonHistoryDao cartoonHistoryDao, CartoonUpdateDao cartoonUpdateDao)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == 13347)
+        {
+            if (data.getData() != null)
+            {
+                FileInputStream fileInputStream = null;
+                InputStreamReader inputStreamReader = null;
+                BufferedReader bufferedReader = null;
+                try
+                {
+                    Uri uri = data.getData();
+                    String path = UriUtil.getPath(this, uri);
+
+                    String fileType = path.substring(path.indexOf(".") + 1);
+                    if (!fileType.contains("json"))
+                    {
+                        toastShow("请选择文件后缀为json的文件");
+                        //不是想要的json文件
+                        return;
+                    }
+                    toastShow(path);
+                    fileInputStream = new FileInputStream(path);
+                    inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
+                    bufferedReader = new BufferedReader(inputStreamReader);
+                    String str;
+                    StringBuilder stringBuilder = new StringBuilder(500);
+                    while ((str = bufferedReader.readLine()) != null)
+                    {
+                        stringBuilder.append(str).append("\n");
+                    }
+                    json = stringBuilder.toString();
+                    userData = JSON.parseObject(json, UserData.class);
+                    recoveryEditText.setText(json);
+                    recoveryData(cartoonFavoritesDao, cartoonHistoryDao, cartoonUpdateDao);
+                }
+                catch (Exception e)
+                {
+                    Log.e(TAG, "onCreate: ", e);
+                    //toastShow(e.getMessage());
+                    new AlertDialog.Builder(RecoveryActivity.this)
+                            .setTitle("错误")
+                            .setMessage("异常内容：\n" + e)
+                            .setPositiveButton("我知道了", null)
+                            .create()
+                            .show();
+                    textView_current.setText(String.valueOf(0));
+                }
+                finally
+                {
+                    try
+                    {
+                        if (fileInputStream != null)
+                        {
+                            fileInputStream.close();
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    try
+                    {
+                        if (inputStreamReader != null)
+                        {
+                            inputStreamReader.close();
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    try
+                    {
+                        if (bufferedReader != null)
+                        {
+                            bufferedReader.close();
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private void recoveryData(CartoonFavoritesDao cartoonFavoritesDao, CartoonHistoryDao
+            cartoonHistoryDao, CartoonUpdateDao cartoonUpdateDao)
     {
         int total = userData.getCartoonFavoritesData().size() +
                 userData.getCartoonHistoryData().size() + userData.getCartoonUpdateData().size();

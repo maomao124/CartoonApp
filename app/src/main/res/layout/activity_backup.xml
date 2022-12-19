@@ -45,7 +45,7 @@
                 android:id="@+id/backupEditText"
                 android:layout_width="match_parent"
                 android:layout_height="400dp"
-                android:background="@null"
+                android:background="#ffaabb"
                 android:lines="17"
                 android:visibility="gone"/>
 
