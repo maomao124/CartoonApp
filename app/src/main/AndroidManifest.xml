@@ -20,15 +20,25 @@
             android:usesCleartextTraffic="true"
             tools:targetApi="31">
         <activity
+                android:name=".RecoveryActivity"
+                android:exported="false"
+                android:screenOrientation="portrait">
+            <meta-data
+                    android:name="android.app.lib_name"
+                    android:value="" />
+        </activity>
+        <activity
                 android:name=".BackupActivity"
-                android:exported="false">
+                android:exported="false"
+                android:screenOrientation="portrait">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
         </activity>
         <activity
                 android:name=".BackupAndRecoveryActivity"
-                android:exported="false">
+                android:exported="false"
+                android:screenOrientation="portrait">
             <meta-data
                     android:name="android.app.lib_name"
                     android:value="" />
