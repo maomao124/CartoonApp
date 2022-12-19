@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ public class CartoonHistoryActivity extends AppCompatActivity
     private List<Cartoon> cartoonList;
     private CartoonListViewAdapter cartoonListViewAdapter;
     private volatile boolean isEmpty = true;
+    private LinearLayout loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,6 +58,7 @@ public class CartoonHistoryActivity extends AppCompatActivity
 
         listView = findViewById(R.id.ListView);
         textView = findViewById(R.id.TextView);
+        loading = findViewById(R.id.loading);
 
         CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
         cartoonFavoritesDao.openReadConnection();
@@ -73,6 +76,10 @@ public class CartoonHistoryActivity extends AppCompatActivity
     {
         super.onStart();
 
+        loading.setVisibility(View.VISIBLE);
+        textView.setVisibility(View.GONE);
+        listView.setVisibility(View.GONE);
+
         MainApplication.getInstance().getThreadPool().submit(new Runnable()
         {
             @Override
@@ -85,6 +92,16 @@ public class CartoonHistoryActivity extends AppCompatActivity
                     Log.d(TAG, "run: 历史记录：" + cartoonHistoryList);
                     if (cartoonHistoryList.size() == 0)
                     {
+                        runOnUiThread(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                loading.setVisibility(View.GONE);
+                                textView.setVisibility(View.VISIBLE);
+                                listView.setVisibility(View.GONE);
+                            }
+                        });
                         return;
                     }
                     isEmpty = false;
@@ -102,8 +119,7 @@ public class CartoonHistoryActivity extends AppCompatActivity
                                 .setAuthor(cartoonHistory.getAuthor())
                                 .setRemarks(simpleDateFormat.format(date))
                                 .setImgUrl(cartoonHistory.getImgUrl());
-                        Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
-                        cartoon.setBitmap(bitmap);
+
                         cartoonList.add(cartoon);
                     }
                     cartoonListViewAdapter = new CartoonListViewAdapter(CartoonHistoryActivity.this, cartoonList);
@@ -112,11 +128,27 @@ public class CartoonHistoryActivity extends AppCompatActivity
                         @Override
                         public void run()
                         {
+                            loading.setVisibility(View.GONE);
                             textView.setVisibility(View.GONE);
                             listView.setVisibility(View.VISIBLE);
                             listView.setAdapter(cartoonListViewAdapter);
                         }
                     });
+
+                    for (Cartoon cartoon : cartoonList)
+                    {
+                        Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
+                        cartoon.setBitmap(bitmap);
+                    }
+                    runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            cartoonListViewAdapter.notifyDataSetChanged();
+                        }
+                    });
+
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                     {
                         @Override
@@ -165,6 +197,9 @@ public class CartoonHistoryActivity extends AppCompatActivity
                         @Override
                         public void run()
                         {
+                            loading.setVisibility(View.GONE);
+                            textView.setVisibility(View.VISIBLE);
+                            listView.setVisibility(View.GONE);
                             new AlertDialog.Builder(CartoonHistoryActivity.this)
                                     .setTitle("错误")
                                     .setMessage("异常内容：\n" + e)
