@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,10 +38,11 @@ public class FavoritesActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
-        toastShow("异步加载中");
+        //toastShow("异步加载中");
 
         ListView listView = findViewById(R.id.ListView);
         TextView textView = findViewById(R.id.TextView);
+        LinearLayout loading = findViewById(R.id.loading);
 
         CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
         cartoonFavoritesDao.openReadConnection();
@@ -59,8 +61,32 @@ public class FavoritesActivity extends AppCompatActivity
             {
                 try
                 {
+                    Thread.sleep(1000);
+                    loading.setVisibility(View.VISIBLE);
+                    textView.setVisibility(View.GONE);
+                    listView.setVisibility(View.GONE);
                     CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(FavoritesActivity.this);
                     cartoonList = cartoonFavoritesDao.queryAll();
+                    if (cartoonList.size() == 0)
+                    {
+                        loading.setVisibility(View.GONE);
+                        textView.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.GONE);
+                        return;
+                    }
+                    cartoonListViewAdapter = new CartoonListViewAdapter(FavoritesActivity.this, cartoonList);
+                    runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            loading.setVisibility(View.GONE);
+                            textView.setVisibility(View.GONE);
+                            listView.setVisibility(View.VISIBLE);
+                            listView.setAdapter(cartoonListViewAdapter);
+                            //toastShow("加载完成");
+                        }
+                    });
                     for (Cartoon cartoon : cartoonList)
                     {
                         Bitmap bitmap = MainApplication.getInstance().loadImage(cartoon);
@@ -75,20 +101,12 @@ public class FavoritesActivity extends AppCompatActivity
                             cartoon.setRemarks("");
                         }*/
                     }
-                    if (cartoonList.size() == 0)
-                    {
-                        return;
-                    }
-                    cartoonListViewAdapter = new CartoonListViewAdapter(FavoritesActivity.this, cartoonList);
                     runOnUiThread(new Runnable()
                     {
                         @Override
                         public void run()
                         {
-                            textView.setVisibility(View.GONE);
-                            listView.setVisibility(View.VISIBLE);
-                            listView.setAdapter(cartoonListViewAdapter);
-                            toastShow("加载完成");
+                            cartoonListViewAdapter.notifyDataSetChanged();
                         }
                     });
                 }
@@ -99,6 +117,9 @@ public class FavoritesActivity extends AppCompatActivity
                         @Override
                         public void run()
                         {
+                            loading.setVisibility(View.GONE);
+                            textView.setVisibility(View.VISIBLE);
+                            listView.setVisibility(View.GONE);
                             new AlertDialog.Builder(FavoritesActivity.this)
                                     .setTitle("错误")
                                     .setMessage("异常内容：\n" + e)

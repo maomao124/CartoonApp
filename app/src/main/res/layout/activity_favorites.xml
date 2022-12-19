@@ -19,7 +19,7 @@
             android:id="@+id/TextView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
+            android:visibility="gone"
             android:text="收藏夹空空如也，快去收藏漫画吧(〃'▽'〃)"
             android:textSize="18sp"
             android:textColor="#00ccff"
@@ -31,5 +31,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone" />
+
+    <LinearLayout
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:visibility="visible">
+
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="加载中,请稍后..."
+                android:layout_marginStart="5dp"
+                android:textSize="20sp"
+                android:textColor="#00ccff" />
+
+    </LinearLayout>
 
 </LinearLayout>
