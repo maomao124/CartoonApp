@@ -296,6 +296,17 @@ public class CartoonUpdateDao extends SQLiteOpenHelper
         return delete > 0;
     }
 
+    /**
+     * 删除所有
+     *
+     * @return boolean
+     */
+    public boolean deleteAll()
+    {
+        int delete = writeDatabase.delete(TABLE_NAME, "1=1", new String[]{});
+        return delete > 0;
+    }
+
 
     /**
      * 填充ContentValues

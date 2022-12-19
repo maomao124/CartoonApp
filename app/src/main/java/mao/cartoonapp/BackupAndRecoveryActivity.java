@@ -7,6 +7,8 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -48,6 +50,27 @@ public class BackupAndRecoveryActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 startActivity(new Intent(BackupAndRecoveryActivity.this, BackupActivity.class));
+            }
+        });
+        recoveryButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                new AlertDialog.Builder(BackupAndRecoveryActivity.this)
+                        .setTitle("警告")
+                        .setMessage("恢复数据将会覆盖当前原有的所有用户数据！是否继续？")
+                        .setPositiveButton("继续", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                startActivity(new Intent(BackupAndRecoveryActivity.this, RecoveryActivity.class));
+                            }
+                        })
+                        .setNeutralButton("取消", null)
+                        .create()
+                        .show();
             }
         });
     }
