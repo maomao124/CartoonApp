@@ -2,15 +2,124 @@ package mao.cartoonapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.util.List;
+
+import mao.cartoonapp.dao.CartoonFavoritesDao;
+import mao.cartoonapp.dao.CartoonHistoryDao;
+import mao.cartoonapp.dao.CartoonUpdateDao;
+import mao.cartoonapp.entity.Cartoon;
+import mao.cartoonapp.entity.CartoonHistory;
+import mao.cartoonapp.entity.CartoonUpdate;
+import mao.cartoonapp.entity.UserData;
 
 public class BackupActivity extends AppCompatActivity
 {
+
+    /**
+     * 备份编辑文本
+     */
+    private EditText backupEditText;
+
+    /**
+     * 标签
+     */
+    private static final String TAG = "BackupActivity";
+    /**
+     * 剪贴板
+     */
+    private Button clipBoard;
+
+    /**
+     * 保存
+     */
+    private Button save;
+
+    /**
+     * 刷新
+     */
+    private Button refresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_backup);
+
+        backupEditText = findViewById(R.id.backupEditText);
+        refresh = findViewById(R.id.backup_refresh);
+        clipBoard = findViewById(R.id.backup_clipBoard);
+        save = findViewById(R.id.backup_save);
+
+        CartoonFavoritesDao cartoonFavoritesDao = CartoonFavoritesDao.getInstance(this);
+        cartoonFavoritesDao.openReadConnection();
+        cartoonFavoritesDao.openWriteConnection();
+        CartoonHistoryDao cartoonHistoryDao = CartoonHistoryDao.getInstance(this);
+        cartoonHistoryDao.openReadConnection();
+        cartoonHistoryDao.openWriteConnection();
+        CartoonUpdateDao cartoonUpdateDao = CartoonUpdateDao.getInstance(this);
+        cartoonUpdateDao.openReadConnection();
+        cartoonUpdateDao.openWriteConnection();
+
+        try
+        {
+            String json = load(cartoonFavoritesDao, cartoonHistoryDao, cartoonUpdateDao);
+
+            backupEditText.setText(json);
+
+            clipBoard.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipboardManager.setText(backupEditText.getText());
+                    toastShow("已复制到剪切板");
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "onCreate: ", e);
+            toastShow(e.getMessage());
+        }
+    }
+
+    /**
+     * 加载
+     *
+     * @param cartoonFavoritesDao CartoonFavoritesDao
+     * @param cartoonHistoryDao   CartoonHistoryDao
+     * @param cartoonUpdateDao    CartoonUpdateDao
+     * @return {@link String}
+     */
+    private String load(CartoonFavoritesDao cartoonFavoritesDao, CartoonHistoryDao cartoonHistoryDao, CartoonUpdateDao cartoonUpdateDao)
+    {
+        List<Cartoon> CartoonFavoritesList = cartoonFavoritesDao.queryAll();
+        List<CartoonHistory> cartoonHistoryList = cartoonHistoryDao.queryAll();
+        List<CartoonUpdate> cartoonUpdateList = cartoonUpdateDao.queryAll();
+        UserData userData = new UserData();
+        userData.setCartoonFavoritesData(CartoonFavoritesList);
+        userData.setCartoonHistoryData(cartoonHistoryList);
+        userData.setCartoonUpdateData(cartoonUpdateList);
+        return userData.toJson();
+    }
+
+    /**
+     * 显示消息
+     *
+     * @param message 消息
+     */
+    private void toastShow(String message)
+    {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

@@ -3,6 +3,7 @@ package mao.cartoonapp.entity;
 import com.alibaba.fastjson.JSON;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Project name(项目名称)：CartoonApp
@@ -22,17 +23,17 @@ public class UserData implements Serializable
     /**
      * 漫画收藏数据
      */
-    private Cartoon cartoonFavoritesData;
+    private List<Cartoon> cartoonFavoritesData;
 
     /**
      * 卡通历史数据
      */
-    private CartoonHistory cartoonHistoryData;
+    private List<CartoonHistory> cartoonHistoryData;
 
     /**
      * 漫画更新数据
      */
-    private CartoonUpdate cartoonUpdateData;
+    private List<CartoonUpdate> cartoonUpdateData;
 
     /**
      * 用户数据
@@ -46,10 +47,10 @@ public class UserData implements Serializable
      * 用户数据
      *
      * @param cartoonFavoritesData 漫画收藏数据
-     * @param cartoonHistoryData   卡通历史数据
+     * @param cartoonHistoryData   漫画历史数据
      * @param cartoonUpdateData    漫画更新数据
      */
-    public UserData(Cartoon cartoonFavoritesData, CartoonHistory cartoonHistoryData, CartoonUpdate cartoonUpdateData)
+    public UserData(List<Cartoon> cartoonFavoritesData, List<CartoonHistory> cartoonHistoryData, List<CartoonUpdate> cartoonUpdateData)
     {
         this.cartoonFavoritesData = cartoonFavoritesData;
         this.cartoonHistoryData = cartoonHistoryData;
@@ -59,9 +60,9 @@ public class UserData implements Serializable
     /**
      * 漫画收藏数据
      *
-     * @return {@link Cartoon}
+     * @return {@link List}<{@link Cartoon}>
      */
-    public Cartoon getCartoonFavoritesData()
+    public List<Cartoon> getCartoonFavoritesData()
     {
         return cartoonFavoritesData;
     }
@@ -72,7 +73,7 @@ public class UserData implements Serializable
      * @param cartoonFavoritesData 漫画收藏数据
      * @return {@link UserData}
      */
-    public UserData setCartoonFavoritesData(Cartoon cartoonFavoritesData)
+    public UserData setCartoonFavoritesData(List<Cartoon> cartoonFavoritesData)
     {
         this.cartoonFavoritesData = cartoonFavoritesData;
         return this;
@@ -81,9 +82,9 @@ public class UserData implements Serializable
     /**
      * 卡通历史数据
      *
-     * @return {@link CartoonHistory}
+     * @return {@link List}<{@link CartoonHistory}>
      */
-    public CartoonHistory getCartoonHistoryData()
+    public List<CartoonHistory> getCartoonHistoryData()
     {
         return cartoonHistoryData;
     }
@@ -94,7 +95,7 @@ public class UserData implements Serializable
      * @param cartoonHistoryData 卡通历史数据
      * @return {@link UserData}
      */
-    public UserData setCartoonHistoryData(CartoonHistory cartoonHistoryData)
+    public UserData setCartoonHistoryData(List<CartoonHistory> cartoonHistoryData)
     {
         this.cartoonHistoryData = cartoonHistoryData;
         return this;
@@ -103,9 +104,9 @@ public class UserData implements Serializable
     /**
      * 让漫画更新数据
      *
-     * @return {@link CartoonUpdate}
+     * @return {@link List}<{@link CartoonUpdate}>
      */
-    public CartoonUpdate getCartoonUpdateData()
+    public List<CartoonUpdate> getCartoonUpdateData()
     {
         return cartoonUpdateData;
     }
@@ -116,11 +117,12 @@ public class UserData implements Serializable
      * @param cartoonUpdateData 漫画更新数据
      * @return {@link UserData}
      */
-    public UserData setCartoonUpdateData(CartoonUpdate cartoonUpdateData)
+    public UserData setCartoonUpdateData(List<CartoonUpdate> cartoonUpdateData)
     {
         this.cartoonUpdateData = cartoonUpdateData;
         return this;
     }
+
 
     @Override
     public boolean equals(Object o)
@@ -168,16 +170,18 @@ public class UserData implements Serializable
     }
 
     /**
+     * 为json
      * 转换为json
      *
      * @return {@link String}
      */
     public String toJson()
     {
-        return JSON.toJSONString(this);
+        return JSON.toJSONString(this, true);
     }
 
     /**
+     * json对象
      * json转对象
      *
      * @param jsonString json字符串
