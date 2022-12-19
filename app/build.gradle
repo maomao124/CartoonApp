@@ -10,8 +10,8 @@ android {
         applicationId "mao.cartoonapp"
         minSdk 25
         targetSdk 32
-        versionCode 9
-        versionName "1.8"
+        versionCode 10
+        versionName "1.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
