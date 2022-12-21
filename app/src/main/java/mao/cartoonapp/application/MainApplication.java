@@ -1,5 +1,6 @@
 package mao.cartoonapp.application;
 
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -610,8 +611,8 @@ public class MainApplication extends Application
                         intent.putExtras(bundle);
                         PendingIntent pendingIntent = PendingIntent.
                                 getActivity(activity, Integer.parseInt(cartoon.getId()),
-                                        intent, 0);
-                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
+                                        intent, PendingIntent.FLAG_IMMUTABLE);
+                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画\""+ cartoon.getName() +"\"更新通知",
                                 "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
@@ -727,8 +728,8 @@ public class MainApplication extends Application
                         intent.putExtras(bundle);
                         PendingIntent pendingIntent = PendingIntent.
                                 getActivity(activity, Integer.parseInt(cartoon.getId()),
-                                        intent, 0);
-                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画更新通知",
+                                        intent, PendingIntent.FLAG_IMMUTABLE);
+                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画\""+ cartoon.getName() +"\"更新通知",
                                 "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
@@ -909,7 +910,7 @@ public class MainApplication extends Application
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         PendingIntent pendingIntent = PendingIntent.
                 getActivity(this, 0,
-                        new Intent(this, cls), 0);
+                        new Intent(this, cls), PendingIntent.FLAG_IMMUTABLE);
         Notification notification = new NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
                 .setContentText(content)
@@ -938,7 +939,7 @@ public class MainApplication extends Application
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         PendingIntent pendingIntent = PendingIntent.
                 getActivity(this, 0,
-                        new Intent(this, cls), 0);
+                        new Intent(this, cls), PendingIntent.FLAG_IMMUTABLE);
         Notification notification = new NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
                 .setContentText(content)
