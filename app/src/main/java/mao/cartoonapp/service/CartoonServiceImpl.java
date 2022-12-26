@@ -263,7 +263,12 @@ public class CartoonServiceImpl implements CartoonService
             Elements p = div2.getElementsByTag("p");
             //System.out.println(p);
             Element authorElement = p.get(0);
+            if (!authorElement.html().contains("作者"))
+            {
+                authorElement = p.get(1);
+            }
             String author = authorElement.html().substring(3);
+
             //System.out.println(author);
             cartoon.setAuthor(author);
 
