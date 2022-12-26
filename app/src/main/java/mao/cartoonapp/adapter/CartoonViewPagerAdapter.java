@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -62,6 +63,10 @@ public class CartoonViewPagerAdapter extends PagerAdapter
 
     private final ListView[] listViewList;
 
+    private final LinearLayout[] loadingList;
+
+    private final LinearLayout[] linearLayoutList;
+
     private final CartoonListViewAdapter[] cartoonListViewAdapterList;
 
     private final String[] titleList =
@@ -82,13 +87,27 @@ public class CartoonViewPagerAdapter extends PagerAdapter
 
         listViewList = new ListView[6];
         cartoonListViewAdapterList = new CartoonListViewAdapter[6];
+        loadingList = new LinearLayout[6];
+        linearLayoutList = new LinearLayout[6];
 
+        //初始化linearLayoutList
+        for (int i = 0; i < linearLayoutList.length; i++)
+        {
+            linearLayoutList[i] = (LinearLayout) LayoutInflater.from(activity).inflate(R.layout.item_pageview, null);
+        }
 
         //初始化listViewList
         for (int i = 0; i < listViewList.length; i++)
         {
-            listViewList[i] = (ListView) LayoutInflater.from(activity).inflate(R.layout.item_pageview, null);
+            listViewList[i] = linearLayoutList[i].findViewById(R.id.ListView);
         }
+
+        //初始化loadingList
+        for (int i = 0; i < loadingList.length; i++)
+        {
+            loadingList[i] = linearLayoutList[i].findViewById(R.id.loading);
+        }
+
 
         MainApplication.getInstance().getThreadPool().submit(new Runnable()
         {
@@ -112,6 +131,15 @@ public class CartoonViewPagerAdapter extends PagerAdapter
                             catch (Exception e)
                             {
                                 Log.e(TAG, "run: ", e);
+                                activity.runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        loadingList[0].setVisibility(View.GONE);
+                                        listViewList[0].setVisibility(View.VISIBLE);
+                                    }
+                                });
                             }
                         }
                     });
@@ -127,6 +155,15 @@ public class CartoonViewPagerAdapter extends PagerAdapter
                             catch (Exception e)
                             {
                                 Log.e(TAG, "run: ", e);
+                                activity.runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        loadingList[2].setVisibility(View.GONE);
+                                        listViewList[2].setVisibility(View.VISIBLE);
+                                    }
+                                });
                             }
                         }
                     });
@@ -142,6 +179,15 @@ public class CartoonViewPagerAdapter extends PagerAdapter
                             catch (Exception e)
                             {
                                 Log.e(TAG, "run: ", e);
+                                activity.runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        loadingList[3].setVisibility(View.GONE);
+                                        listViewList[3].setVisibility(View.VISIBLE);
+                                    }
+                                });
                             }
                         }
                     });
@@ -157,6 +203,15 @@ public class CartoonViewPagerAdapter extends PagerAdapter
                             catch (Exception e)
                             {
                                 Log.e(TAG, "run: ", e);
+                                activity.runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        loadingList[4].setVisibility(View.GONE);
+                                        listViewList[4].setVisibility(View.VISIBLE);
+                                    }
+                                });
                             }
                         }
                     });
@@ -172,6 +227,15 @@ public class CartoonViewPagerAdapter extends PagerAdapter
                             catch (Exception e)
                             {
                                 Log.e(TAG, "run: ", e);
+                                activity.runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        loadingList[5].setVisibility(View.GONE);
+                                        listViewList[5].setVisibility(View.VISIBLE);
+                                    }
+                                });
                             }
                         }
                     });
@@ -185,6 +249,8 @@ public class CartoonViewPagerAdapter extends PagerAdapter
                         @Override
                         public void run()
                         {
+                            loadingList[1].setVisibility(View.GONE);
+                            listViewList[1].setVisibility(View.VISIBLE);
                             new AlertDialog.Builder(activity)
                                     .setTitle("错误")
                                     .setMessage("异常内容：\n" + e)
@@ -518,6 +584,11 @@ public class CartoonViewPagerAdapter extends PagerAdapter
 
     }
 
+    /**
+     * load1
+     *
+     * @param activity 活动
+     */
     private void load1(Activity activity)
     {
         int pageNumber = 0;
@@ -533,6 +604,8 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             {
                 cartoonListViewAdapterList[pageNumber].notifyDataSetChanged();
                 listViewList[pageNumber].setAdapter(cartoonListViewAdapterList[pageNumber]);
+                loadingList[pageNumber].setVisibility(View.GONE);
+                listViewList[pageNumber].setVisibility(View.VISIBLE);
             }
         });
         for (Cartoon cartoon : cartoonList1)
@@ -555,6 +628,11 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     }
 
 
+    /**
+     * load2
+     *
+     * @param activity 活动
+     */
     private void load2(Activity activity)
     {
         int pageNumber = 1;
@@ -570,6 +648,8 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             {
                 cartoonListViewAdapterList[pageNumber].notifyDataSetChanged();
                 listViewList[pageNumber].setAdapter(cartoonListViewAdapterList[pageNumber]);
+                loadingList[pageNumber].setVisibility(View.GONE);
+                listViewList[pageNumber].setVisibility(View.VISIBLE);
             }
         });
         for (Cartoon cartoon : cartoonList2)
@@ -591,6 +671,11 @@ public class CartoonViewPagerAdapter extends PagerAdapter
         Log.d(TAG, "run: 第2页加载完成");
     }
 
+    /**
+     * load3
+     *
+     * @param activity 活动
+     */
     private void load3(Activity activity)
     {
         int pageNumber = 2;
@@ -606,6 +691,8 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             {
                 cartoonListViewAdapterList[pageNumber].notifyDataSetChanged();
                 listViewList[pageNumber].setAdapter(cartoonListViewAdapterList[pageNumber]);
+                loadingList[pageNumber].setVisibility(View.GONE);
+                listViewList[pageNumber].setVisibility(View.VISIBLE);
             }
         });
         for (Cartoon cartoon : cartoonList3)
@@ -628,6 +715,11 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     }
 
 
+    /**
+     * load4
+     *
+     * @param activity 活动
+     */
     private void load4(Activity activity)
     {
         int pageNumber = 3;
@@ -643,6 +735,8 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             {
                 cartoonListViewAdapterList[pageNumber].notifyDataSetChanged();
                 listViewList[pageNumber].setAdapter(cartoonListViewAdapterList[pageNumber]);
+                loadingList[pageNumber].setVisibility(View.GONE);
+                listViewList[pageNumber].setVisibility(View.VISIBLE);
             }
         });
         for (Cartoon cartoon : cartoonList4)
@@ -665,6 +759,11 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     }
 
 
+    /**
+     * load5
+     *
+     * @param activity 活动
+     */
     private void load5(Activity activity)
     {
         int pageNumber = 4;
@@ -680,6 +779,8 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             {
                 cartoonListViewAdapterList[pageNumber].notifyDataSetChanged();
                 listViewList[pageNumber].setAdapter(cartoonListViewAdapterList[pageNumber]);
+                loadingList[pageNumber].setVisibility(View.GONE);
+                listViewList[pageNumber].setVisibility(View.VISIBLE);
             }
         });
         for (Cartoon cartoon : cartoonList5)
@@ -702,6 +803,11 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     }
 
 
+    /**
+     * load6
+     *
+     * @param activity 活动
+     */
     private void load6(Activity activity)
     {
         int pageNumber = 5;
@@ -717,6 +823,8 @@ public class CartoonViewPagerAdapter extends PagerAdapter
             {
                 cartoonListViewAdapterList[pageNumber].notifyDataSetChanged();
                 listViewList[pageNumber].setAdapter(cartoonListViewAdapterList[pageNumber]);
+                loadingList[pageNumber].setVisibility(View.GONE);
+                listViewList[pageNumber].setVisibility(View.VISIBLE);
             }
         });
         for (Cartoon cartoon : cartoonList6)
@@ -756,15 +864,17 @@ public class CartoonViewPagerAdapter extends PagerAdapter
     public Object instantiateItem(@NonNull ViewGroup container, int position)
     {
         Log.d(TAG, "instantiateItem: 页面初始化：" + position);
-        container.addView(listViewList[position]);
-        return listViewList[position];
+        //container.addView(listViewList[position]);
+        container.addView(linearLayoutList[position]);
+        return linearLayoutList[position];
     }
 
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object)
     {
         Log.d(TAG, "instantiateItem: 页面销毁：" + position);
-        container.removeView(listViewList[position]);
+        //container.removeView(listViewList[position]);
+        container.removeView(linearLayoutList[position]);
     }
 
     @Nullable
