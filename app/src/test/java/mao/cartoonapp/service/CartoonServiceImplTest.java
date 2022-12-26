@@ -139,5 +139,22 @@ class CartoonServiceImplTest
 //        List<Cartoon> cartoonList = cartoonService.search("斗破苍穹");
 //        System.out.println("数量：" + cartoonList.size());
 //        System.out.println(cartoonList);
+//
+//
+//    @Test
+//    void getCartoonById()
+//    {
+//        Cartoon cartoon = cartoonService.getCartoonById("21429");
+//        System.out.println();
+//        System.out.println(cartoon);
+//    }
+//
+//    @Test
+//    void getCartoonById2()
+//    {
+//        Cartoon cartoon = cartoonService.getCartoonById("25412");
+//        System.out.println();
+//        System.out.println(cartoon);
+//    }
 //    }
 }

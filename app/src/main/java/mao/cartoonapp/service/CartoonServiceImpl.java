@@ -215,4 +215,74 @@ public class CartoonServiceImpl implements CartoonService
         }
         return list;
     }
+
+
+    /**
+     * 通过id获取漫画对象
+     *
+     * @param id id
+     * @return {@link Cartoon}
+     */
+    @Override
+    public Cartoon getCartoonById(String id)
+    {
+        try
+        {
+            String url = URLConstant.baseUrl + id + "/";
+            String html = http.GET(url);
+            Document document = Jsoup.parse(html);
+            //System.out.println(document);
+            Element main = document.getElementsByClass("main detail-container").first();
+            //System.out.println(main);
+            if (main == null)
+            {
+                return null;
+            }
+            Element div = main.getElementsByClass("comic-info-box").first();
+            //System.out.println(div);
+            if (div == null)
+            {
+                return null;
+            }
+            Cartoon cartoon = new Cartoon();
+            Element img = div.getElementsByTag("img").first();
+            //System.out.println(img);
+            assert img != null;
+            String src = img.attr("src");
+            //System.out.println(src);
+            cartoon.setImgUrl(src);
+
+            Element div2 = div.getElementsByClass("box-back2").first();
+            //System.out.println(div2);
+            assert div2 != null;
+            Element h1 = div2.getElementsByTag("h1").first();
+            assert h1 != null;
+            String name = h1.html();
+            cartoon.setName(name);
+
+            Elements p = div2.getElementsByTag("p");
+            //System.out.println(p);
+            Element authorElement = p.get(0);
+            String author = authorElement.html().substring(3);
+            //System.out.println(author);
+            cartoon.setAuthor(author);
+
+            Element last = p.last();
+            assert last != null;
+            Element remarkElement = last.getElementsByTag("a").first();
+            //System.out.println(remarkElement);
+            assert remarkElement != null;
+            String remark = remarkElement.html().substring(5);
+            //System.out.println(remark);
+            cartoon.setRemarks(remark);
+
+            cartoon.setId(id);
+
+            return cartoon;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
 }
