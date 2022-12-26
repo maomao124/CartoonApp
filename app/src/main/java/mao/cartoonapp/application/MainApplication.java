@@ -351,7 +351,7 @@ public class MainApplication extends Application
             return bitmap;
         }
         //本地不存在,从网络上加载
-        ImageLoadResult imageLoadResult = openImageByHTTP(cartoon.getImgUrl());
+        ImageLoadResult imageLoadResult = openImageByHTTP(cartoon);
         if (imageLoadResult.isStatus())
         {
             Log.d(TAG, "loadImage: 从网络上加载图片成功：" + cartoon.getId());
@@ -388,6 +388,12 @@ public class MainApplication extends Application
     }
 
 
+    /**
+     * 从网络上加载图片
+     *
+     * @param imgUrl img url
+     * @return {@link ImageLoadResult}
+     */
     public ImageLoadResult openImageByHTTP(String imgUrl)
     {
         Bitmap bitmap;
@@ -426,6 +432,35 @@ public class MainApplication extends Application
                 httpURLConnection.disconnect();
             }
         }
+    }
+
+    /**
+     * 从网络上加载图片
+     *
+     * @param cartoon 卡通
+     * @return {@link ImageLoadResult}
+     */
+    public ImageLoadResult openImageByHTTP(Cartoon cartoon)
+    {
+        ImageLoadResult imageLoadResult = openImageByHTTP(cartoon.getImgUrl());
+        //判断是否加载成功
+        if (imageLoadResult.isStatus())
+        {
+            //加载成功，返回
+            return imageLoadResult;
+        }
+        //加载失败
+        //请求最新数据
+        Cartoon cartoon1 = cartoonService.getCartoonById(cartoon.getId());
+        //判断是否为空
+        if (cartoon1 == null)
+        {
+            return imageLoadResult;
+        }
+        //新图片地址
+        cartoon.setImgUrl(cartoon1.getImgUrl());
+        //加载新图片，直接返回
+        return openImageByHTTP(cartoon.getImgUrl());
     }
 
 
@@ -612,7 +647,7 @@ public class MainApplication extends Application
                         PendingIntent pendingIntent = PendingIntent.
                                 getActivity(activity, Integer.parseInt(cartoon.getId()),
                                         intent, PendingIntent.FLAG_IMMUTABLE);
-                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画\""+ cartoon.getName() +"\"更新通知",
+                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画\"" + cartoon.getName() + "\"更新通知",
                                 "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
@@ -729,7 +764,7 @@ public class MainApplication extends Application
                         PendingIntent pendingIntent = PendingIntent.
                                 getActivity(activity, Integer.parseInt(cartoon.getId()),
                                         intent, PendingIntent.FLAG_IMMUTABLE);
-                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画\""+ cartoon.getName() +"\"更新通知",
+                        sendNotification("1", Integer.parseInt(cartoon.getId()), "漫画\"" + cartoon.getName() + "\"更新通知",
                                 "您收藏的漫画\"" + cartoon.getName() + "\"已更新"
                                         + (cartoonItem.size() - cartoonUpdate.getItemCount()) +
                                         "章，当前最新章节为\"" + cartoonItem.get(0).getName() + "\"",
