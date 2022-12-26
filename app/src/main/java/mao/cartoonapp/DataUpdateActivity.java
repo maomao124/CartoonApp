@@ -142,6 +142,8 @@ public class DataUpdateActivity extends AppCompatActivity
                 final int[] errorCount = {0};
                 current = 0;
                 button.setEnabled(false);
+                button.setText("更新中...");
+                textView_current.setText(String.valueOf((0)));
                 MainApplication.getInstance().getThreadPool().submit(new Runnable()
                 {
                     @Override
@@ -171,6 +173,7 @@ public class DataUpdateActivity extends AppCompatActivity
                                 public void run()
                                 {
                                     button.setEnabled(true);
+                                    button.setText("开始更新");
                                     textView.setText("");
                                     if (errorCount[0] == 0)
                                     {
@@ -199,6 +202,7 @@ public class DataUpdateActivity extends AppCompatActivity
                                 public void run()
                                 {
                                     button.setEnabled(true);
+                                    button.setText("开始更新");
                                     Log.e(TAG, "onCreate: ", e);
                                     //toastShow(e.getMessage());
                                     new AlertDialog.Builder(DataUpdateActivity.this)
@@ -249,7 +253,7 @@ public class DataUpdateActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
-                    textView_current.setText(String.valueOf((current + 1)));
+                    textView_current.setText(String.valueOf((current)));
                     textView.setText(jsonString);
                 }
             });
@@ -299,7 +303,7 @@ public class DataUpdateActivity extends AppCompatActivity
                 @Override
                 public void run()
                 {
-                    textView_current.setText(String.valueOf((current + 1)));
+                    textView_current.setText(String.valueOf((current)));
                     textView.setText(jsonString);
                 }
             });
