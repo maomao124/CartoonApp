@@ -36,6 +36,11 @@ public class OtherConstant
             "function hideOther() \n" +
             "{\n" +
             "\tgetClass(document,'guide-download')[0].style.display='none';\n" +
+            "\tgetClass(document,'ad_js')[0].style.display='none';\n" +
+            "\tgetClass(document,'read-end')[0].style.display='none';\n" +
+            "\tgetClass(document,'comment-box hide')[0].style.display='none';\n" +
+            "\tgetClass(document,'comment-input-box')[0].style.display='none';\n" +
+            "\tgetClass(document,'ad_js')[0].remove();\n" +
             "\tgetClass(document,'xxtop')[0].style.display='none';\n" +
             "\tgetClass(document,'list3_1 similar clearfix mt10')[0].style.display='none';\n" +
             "\tgetClass(document,'read-end')[0].style.display='none';\n" +
@@ -69,10 +74,18 @@ public class OtherConstant
             "9.作者QQ：1296193245\n" +
             "10.作者github：https://github.com/maomao124/" +
             "\n\n" +
-            "当前版本：v1.11" +
+            "当前版本：v1.12" +
             "\n\n\n" +
             "版本更新说明：" +
             "\n\n" +
+            "\n" +
+            "\n" +
+            "v1.12：\n" +
+            "2023/03/02\n" +
+            "1.更改请求的url\n" +
+            "2.更新拦截逻辑" +
+            "\n" +
+            "\n" +
             "\n" +
             "\n" +
             "v1.11：\n" +
