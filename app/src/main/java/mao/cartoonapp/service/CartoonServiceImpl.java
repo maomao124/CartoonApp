@@ -1,5 +1,9 @@
 package mao.cartoonapp.service;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
+import android.util.Log;
+
 import com.alibaba.fastjson.JSON;
 
 import mao.cartoonapp.constant.URLConstant;
@@ -76,6 +80,7 @@ public class CartoonServiceImpl implements CartoonService
         for (int i = 0; i < 6; i++)
         {
             List<Cartoon> cartoonList = getCartoonListByJson(map, i, type);
+            Log.d(TAG, "getCartoonList: " + i + "  " + type + "\n" + cartoonList);
             list.addAll(cartoonList);
         }
         return list;

@@ -74,10 +74,16 @@ public class OtherConstant
             "9.作者QQ：1296193245\n" +
             "10.作者github：https://github.com/maomao124/" +
             "\n\n" +
-            "当前版本：v1.12" +
+            "当前版本：v1.13" +
             "\n\n\n" +
             "版本更新说明：" +
             "\n\n" +
+            "\n" +
+            "\n" +
+            "v1.13：\n" +
+            "2023/08/15\n" +
+            "1.更改请求的url\n" +
+            "\n" +
             "\n" +
             "\n" +
             "v1.12：\n" +
