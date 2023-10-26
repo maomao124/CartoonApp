@@ -15,8 +15,8 @@ package mao.cartoonapp.constant;
 
 public class URLConstant
 {
-    public static final String baseUrl = "http://m.qiman52.com/";
-    public static final String host = "m.qiman52.com";
+    public static final String baseUrl = "http://m.qmanwu.com/";
+    public static final String host = "m.qmanwu.com";
     public static final String bookChapterUrl = baseUrl + "bookchapter/";
 
     public static final String searchUrl = baseUrl + "spotlight/?keyword=";
